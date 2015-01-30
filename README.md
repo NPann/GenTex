@@ -1,8 +1,10 @@
 # README #
 
-The GenTex or general texture analysis package provides a suite of routines that combines standard texture analysis methods and entropy/statistical complexity analysis methods to provide a number of the standard algorithms required for generating complexity/texture measure estimates from multimodal imaging data. These include: 
+The GenTex or general texture analysis package provides a suite of routines that combines standard texture analysis methods and entropy/statistical complexity analysis methods.
 
 ### What is this repository for? ###
+
+GenTex provides a number of the standard algorithms required for generating complexity/texture measure estimates from multimodal imaging data. These include: 
 
 1. Generation of multidimensional feature spaces from multimodal 'image' data (i.e. multiple 'co-registered' 1,2,3, or 4 dimensional data sets, e.g. multiple 'co-registered' time series, multimodal image data, space/time data..) via the use of a set of image templates, including:
 
