@@ -1,12 +1,12 @@
-
 # gentex.feature package
 #
 # note - what's in init should be rewritten in C similar to makecomat.c
-#        for a significant speed increase - current question is how
+# for a significant speed increase - current question is how
 #        to handle the possibility of being handed a variable number
 #        of images and the mask to build the feature space with, using cytypes
 
 import numpy as np
+
 
 class features:
     """
@@ -80,23 +80,24 @@ class features:
                default = 'BIC'
     
     """
-    def __init__(self,images,mask,template):
+
+    def __init__(self, images, mask, template):
 
         self.images = images
         self.mask = mask
         self.template = template
-        self.fs = np.array([],dtype=np.float32)
-        self.fsc = np.array([],dtype=np.int16)
-        self.fsmask = np.zeros(self.images[0].shape,dtype=np.int16)
+        self.fs = np.array([], dtype=np.float32)
+        self.fsc = np.array([], dtype=np.int16)
+        self.fsmask = np.zeros(self.images[0].shape, dtype=np.int16)
         self.foundfeat = 0
-        self.clusim = np.zeros(self.images[0].shape,dtype=np.int16)
+        self.clusim = np.zeros(self.images[0].shape, dtype=np.int16)
         self.numclus = 3
         self.cluscrit = 'BIC'
         self.clusmax = 20
 
         # Need to do conversion to numpy.int16 here (and back later)
         # to squeeze as much memory as we can for big images
-        
+
         # Make sure images and mask have same dimension
         self.dims = images[0].shape
         assert len(self.dims) == len(self.mask.shape)
@@ -104,175 +105,69 @@ class features:
         assert len(self.dims) == len(template[0])
 
         # Determinxe number of features
-        self.numfeats = len(template)*len(images) 
+        self.numfeats = len(template) * len(images)
 
         # Get upper and lower bounds in image to grab
         # by getting max and min values from template
         # points
-        maxs = np.max(np.array(self.template),axis=0)
-        mins = np.min(np.array(self.template),axis=0)
+        maxs = np.max(np.array(self.template), axis=0)
+        mins = np.min(np.array(self.template), axis=0)
         # don't bump into edge of array
         uplim = self.dims - maxs
         # for negative offsets need to move away from lower boundary
         # otherwise can start at zero
-        lowlim = np.where(np.greater(-mins,0),-mins,0)
+        lowlim = np.where(np.greater(-mins, 0), -mins, 0)
         # Get feature space co-ordinate array, fsc;
         # already determined by image parsing limits uplim,lowlim
-        ind = np.indices(uplim-lowlim)
+        ind = np.indices(uplim - lowlim)
         # self.fsc = np.transpose(np.array([np.ravel(ind[i]+lowlim[i]) for i in range(len(lowlim))]))
-        self.fsc = np.array([np.ravel(ind[i]+lowlim[i]) for i in range(len(lowlim))],dtype=np.int16)
+        self.fsc = np.array([np.ravel(ind[i] + lowlim[i]) for i in range(len(lowlim))], dtype=np.int16)
         # Now get feature space columns, i.e. each column is
         # a combination of image + template element
         # This is REALLY parallelizable - i.e. each column can be done
         # independently
         imcount = 0
         colcount = 0
-        for im in images: #
-            for temp in template: # template points
+        for im in images:  #
+            for temp in template:  # template points
                 upl = uplim + temp
                 downl = lowlim + temp
                 # Thanks to Robert Kern for the following bit of index magic
-                thiscol = np.ravel((np.where(self.mask == 1,im,np.inf))[tuple([slice(down,up) for down,up in zip(downl,upl)])])
+                thiscol = np.ravel(
+                    (np.where(self.mask == 1, im, np.inf))[tuple([slice(down, up) for down, up in zip(downl, upl)])])
                 # Do some gymnastics for shortening feature space vectors
                 # as you go re. memory efficiency
                 if colcount == 0:
                     badelts = np.array(np.where(thiscol == np.inf)[0])
                     # oops !
                     # self.fs = np.array(np.delete(thiscol,badelts,0),dtype=np.int16)
-                    self.fs = np.array(np.delete(thiscol,badelts,0),dtype=np.float32)
+                    self.fs = np.array(np.delete(thiscol, badelts, 0), dtype=np.float32)
                 else:
                     badnew = np.array(np.where(thiscol == np.inf)[0])
-                    newstack = np.array(np.delete(thiscol,badelts,0),dtype=np.float32)
+                    newstack = np.array(np.delete(thiscol, badelts, 0), dtype=np.float32)
                     shortnew = np.where(newstack == np.inf)[0]
-                    badelts = np.array(np.unique(np.append(badelts,badnew)))
+                    badelts = np.array(np.unique(np.append(badelts, badnew)))
                     if colcount == 1:
                         if newstack.size != 0:
-                            self.fs = np.vstack((np.delete(self.fs,shortnew,0),np.delete(newstack,shortnew,0)))
+                            self.fs = np.vstack((np.delete(self.fs, shortnew, 0), np.delete(newstack, shortnew, 0)))
                     else:
                         if newstack.size != 0:
-                            self.fs = np.vstack((np.delete(self.fs,shortnew,1),np.delete(newstack,shortnew,0)))
+                            self.fs = np.vstack((np.delete(self.fs, shortnew, 1), np.delete(newstack, shortnew, 0)))
                 colcount += 1
-            del(im)
+            del (im)
             imcount += 1
         self.fs = np.transpose(self.fs)
         # Delete bad elements from coordinate space
-        self.fsc = np.array(np.delete(self.fsc,badelts,1),dtype=np.int16)
+        self.fsc = np.array(np.delete(self.fsc, badelts, 1), dtype=np.int16)
         self.fsc = tuple(self.fsc)
         self.fsmask[self.fsc] = 1
         # NOTE: The above could easily be generalized to handle
         # different templates in the different images.
         # The feature space would be more complicated, i.e. would have
         # to AND different masks but what the heck...
-            
-## !!!!!!!!!!!!!!!!!!!!! DUMB (replaced with above) !!!!!!!!!!!!!!!!!!!
-##         if len(self.dims) == 1:
-##             for i in range(self.dims[0]):
-##                 offtemp = [[self.template[te] + i] for te in range(len(self.template))]
-##                 coords = np.array(offtemp)[:,0]
-##                 imcount = 0
-##                 buildfeat = np.array([])
-##                 for im in images:
-##                     # all template elements within image ?
-##                     if np.all(offtemp < np.array(self.dims)):
-##                         # all template elements within mask ?
-##                         if (sum(self.masks[imcount][coords]) == len(offtemp)):
-##                             buildfeat = np.append(buildfeat,im[coords])
-##                 if len(buildfeat) == self.numfeats: # all features go !
-##                     if self.foundfeat == 0:
-##                         self.fs = buildfeat
-##                         self.fsc = np.array([i])
-##                     else:
-##                         self.fs = np.vstack((self.fs,buildfeat))
-##                         self.fsc = np.vstack((self.fsc,[i]))
-##                     self.foundfeat += 1
-##             # proper output to feed array as indices
-##             self.fsc = tuple(np.transpose(self.fsc))
-##             self.fsmask[self.fsc] = 1
 
-##         elif len(self.dims) == 2:
-##             for i in range(self.dims[0]):
-##                 for j in range(self.dims[1]):
-##                     offtemp = [[self.template[te][0] + i,self.template[te][1]+j] for te in range(len(self.template))]
-##                     coords = np.array(offtemp)[:,0],np.array(offtemp)[:,1]
-##                     imcount = 0
-##                     buildfeat = np.array([])
-##                     for im in images:
-##                         # all template elements within image ?
-##                         if np.all(offtemp < np.array(self.dims)):
-##                             # all template elements within mask ?
-##                             if (sum(self.masks[imcount][coords]) == len(offtemp)):
-##                                 buildfeat = np.append(buildfeat,im[coords])
-##                     if len(buildfeat) == self.numfeats: # all features go !
-##                         if self.foundfeat == 0:
-##                             self.fs = buildfeat
-##                             self.fsc = np.array([i,j])
-##                         else:
-##                             self.fs = np.vstack((self.fs,buildfeat))
-##                             self.fsc = np.vstack((self.fsc,[i,j]))
-##                         self.foundfeat += 1
-##             # proper output to feed array as indices
-##             self.fsc = tuple(np.transpose(self.fsc))
-##             self.fsmask[self.fsc] = 1
 
-##         elif len(self.dims) == 3:
-##             for i in range(self.dims[0]):
-##                 for j in range(self.dims[1]):
-##                     for k in range(self.dims[2]):
-##                         offtemp = [[self.template[te][0] + i,self.template[te][1]+j,self.template[te][2] + k] for te in range(len(self.template))]
-##                         coords = np.array(offtemp)[:,0],np.array(offtemp)[:,1],np.array(offtemp)[:,2]
-##                         imcount = 0
-##                         buildfeat = np.array([])
-##                         for im in images:
-##                             # all template elements within image ?
-##                             if np.all(offtemp < np.array(self.dims)):
-##                                 # all template elements within mask ?
-##                                 if (sum(self.masks[imcount][coords]) == len(offtemp)):
-##                                     buildfeat = np.append(buildfeat,im[coords])
-##                         if len(buildfeat) == self.numfeats: # all features go !
-##                             if self.foundfeat == 0:
-##                                 self.fs = buildfeat
-##                                 self.fsc = np.array([i,j,k])
-##                             else:
-##                                 self.fs = np.vstack((self.fs,buildfeat))
-##                                 self.fsc = np.vstack((self.fsc,[i,j,k]))
-##                             self.foundfeat += 1
-##             # proper output to feed array as indices
-##             self.fsc = tuple(np.transpose(self.fsc))
-##             self.fsmask[self.fsc] = 1
-
-##         elif len(self.dims) == 4:
-##             for i in range(self.dims[0]):
-##                 for j in range(self.dims[1]):
-##                     for k in range(self.dims[2]):
-##                         for t in range(self.dims[3]):
-##                             offtemp = [[self.template[te][0] + i,self.template[te][1]+j,self.template[te][2] + k,self.template[te][3] + t] for te in range(len(self.template))]
-##                             coords = np.array(offtemp)[:,0],np.array(offtemp)[:,1],np.array(offtemp)[:,2],np.array(offtemp)[:,3]
-##                             imcount = 0
-##                             buildfeat = np.array([])
-##                             for im in images:
-##                                 # all template elements within image ?
-##                                 if np.all(offtemp < np.array(self.dims)):
-##                                     # all template elements within mask ?
-##                                     if (sum(self.masks[imcount][coords]) == len(offtemp)):
-##                                         buildfeat = np.append(buildfeat,im[coords])
-##                             if len(buildfeat) == self.numfeats: # all features go !
-##                                 if self.foundfeat == 0:
-##                                     self.fs = buildfeat
-##                                     self.fsc = np.array([i,j,k,t])
-##                                 else:
-##                                     self.fs = np.vstack((self.fs,buildfeat))
-##                                     self.fsc = np.vstack((self.fsc,[i,j,k,t]))
-##                                 self.foundfeat += 1
-##             # proper output to feed array as indices
-##             self.fsc = tuple(np.transpose(self.fsc))
-##             self.fsmask[self.fsc] = 1
-##         print "self.fs.shape",self.fs.shape
-##         print "len(self.fsc)",len(self.fsc)
-##         print "self.fs[0]",self.fs[0]
-##         print "self.fsc[0]",self.fsc[0]
-        
-
-    def clusfs(self,method="Kmeans",numclus=3,clusmax=20,cluscrit='BIC'):
+    def clusfs(self, method="Kmeans", numclus=3, clusmax=20, cluscrit='BIC'):
         """
         method clusfs - clusters feature space
 
@@ -322,40 +217,41 @@ class features:
             opto = []
             b = sc.vq.whiten(self.fs)
             if self.cluscrit == "ICL":
-               print("Haven't implemented ICL yet, using BIC...")
-            if numclus < 2: # numclus < 2 means try to find "best" cluster size
-                for i in range(2,min([self.clusmax+1,self.fs.shape[0]+1])):
-                    z = sc.vq.kmeans(b,i)
-                    t = sc.vq.kmeans2(b,z[0])
-                    if i == self.fs.shape[0]: # perfect explanation !
+                print("Haven't implemented ICL yet, using BIC...")
+            if numclus < 2:  # numclus < 2 means try to find "best" cluster size
+                for i in range(2, min([self.clusmax + 1, self.fs.shape[0] + 1])):
+                    z = sc.vq.kmeans(b, i)
+                    t = sc.vq.kmeans2(b, z[0])
+                    if i == self.fs.shape[0]:  # perfect explanation !
                         lh = 1.0
                     else:
-                       # Not sure this works - Supposed to be Gaussian - see
-                       # Gouette et al. mentioned above.
-                       sig = (1./b.shape[0])*np.sum((np.abs(t[0][t[1]] - b))**2)
-                       lh = np.sum(np.log2(1./(np.sqrt(2.*np.pi*sig*sig)))*np.exp(-((1./(2.*sig*sig))*np.sum((t[0][t[1]] - b)**2,axis=1))))
-                       # Could als try something like log2(1 -"distortion")
-                       # lh = np.log2(1.0 - z[1])
-                       if self.cluscrit == "AIC":
-                           opto.append(lh - (i*self.fs.shape[1]+1))
-                       elif self.cluscrit == "ICL":
-                           # later, man - stick BIC here for now
-                           print("Warning: ICL not quite ready, using BIC")
-                           opto.append(lh - ((i*self.fs.shape[1]+1)/2.)*np.log2(self.fs.shape[1]))
-                       else: # for now assume anything else means default, i.e. BIC 
-                           opto.append(lh - ((i*self.fs.shape[1]+1)/2.)*np.log2(self.fs.shape[1]))
-                       # print i,lh,opto
-                   # Find where max cluster size is in opto and generate clus size
+                        # Not sure this works - Supposed to be Gaussian - see
+                        # Gouette et al. mentioned above.
+                        sig = (1. / b.shape[0]) * np.sum((np.abs(t[0][t[1]] - b)) ** 2)
+                        lh = np.sum(np.log2(1. / (np.sqrt(2. * np.pi * sig * sig))) * np.exp(
+                            -((1. / (2. * sig * sig)) * np.sum((t[0][t[1]] - b) ** 2, axis=1))))
+                        # Could als try something like log2(1 -"distortion")
+                        # lh = np.log2(1.0 - z[1])
+                        if self.cluscrit == "AIC":
+                            opto.append(lh - (i * self.fs.shape[1] + 1))
+                        elif self.cluscrit == "ICL":
+                            # later, man - stick BIC here for now
+                            print("Warning: ICL not quite ready, using BIC")
+                            opto.append(lh - ((i * self.fs.shape[1] + 1) / 2.) * np.log2(self.fs.shape[1]))
+                        else:  # for now assume anything else means default, i.e. BIC
+                            opto.append(lh - ((i * self.fs.shape[1] + 1) / 2.) * np.log2(self.fs.shape[1]))
+                            # print i,lh,opto
+                            # Find where max cluster size is in opto and generate clus size
                 self.numclus = np.array(opto).argmax() + 2
                 # urk, do it again
-                z = sc.vq.kmeans(sc.vq.whiten(self.fs),self.numclus)
-                t = sc.vq.kmeans2(sc.vq.whiten(self.fs),z[0])
+                z = sc.vq.kmeans(sc.vq.whiten(self.fs), self.numclus)
+                t = sc.vq.kmeans2(sc.vq.whiten(self.fs), z[0])
                 self.clusim[self.fsc] = t[1]
-                print("Using",self.numclus,"clusters for feature space")
-            else: # just use self.numclus
-                z = sc.vq.kmeans(sc.vq.whiten(self.fs),self.numclus)
-                t = sc.vq.kmeans2(sc.vq.whiten(self.fs),z[0])
-                self.clusim[self.fsc] = t[1]            
+                print("Using", self.numclus, "clusters for feature space")
+            else:  # just use self.numclus
+                z = sc.vq.kmeans(sc.vq.whiten(self.fs), self.numclus)
+                t = sc.vq.kmeans2(sc.vq.whiten(self.fs), z[0])
+                self.clusim[self.fsc] = t[1]
         else:
             print("Sorry Kmeans only clustering method currently supported")
         

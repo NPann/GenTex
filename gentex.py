@@ -36,8 +36,9 @@
              co-occurrence matrices.
 """
 
-import numpy as np
 import sys
+
+import numpy as np
 
 
 try:
@@ -47,99 +48,100 @@ except:
     sys.exit(-1)
 
 try:
-    _comat = np.ctypeslib.load_library('libmakecomat_',__file__)
+    _comat = np.ctypeslib.load_library('libmakecomat_', __file__)
 except:
-    print('Failed to load libmakecomat_.so.  Compile the library using python setup.py build_ext -i from the package root directory.')
+    print(
+        'Failed to load libmakecomat_.so.  Compile the library using python setup.py build_ext -i from the package root directory.')
     sys.exit(-1)
 
-
-array_1d_int = np.ctypeslib.ndpointer(dtype=np.intc,ndim=1,
+array_1d_int = np.ctypeslib.ndpointer(dtype=np.intc, ndim=1,
                                       flags='CONTIGUOUS')
-array_2d_int = np.ctypeslib.ndpointer(dtype=np.intc,ndim=2,
+array_2d_int = np.ctypeslib.ndpointer(dtype=np.intc, ndim=2,
                                       flags='CONTIGUOUS')
-array_3d_int = np.ctypeslib.ndpointer(dtype=np.intc,ndim=3,
+array_3d_int = np.ctypeslib.ndpointer(dtype=np.intc, ndim=3,
                                       flags='CONTIGUOUS')
-array_4d_int = np.ctypeslib.ndpointer(dtype=np.intc,ndim=4,
+array_4d_int = np.ctypeslib.ndpointer(dtype=np.intc, ndim=4,
                                       flags='CONTIGUOUS')
 
 # Define API's
 
 libmakecomat_api = {
-   'makecomat1D' : (None,
-                  [array_1d_int,
-                   array_1d_int, 
-                   c_int,
-                   array_1d_int,
-                   c_int,
-                   array_2d_int],
-                  ),
-   'makecomat2D' : (None,
-                  [array_2d_int, array_2d_int,
-                   c_int, c_int,
-                   array_1d_int,
-                   c_int,
-                   array_2d_int],
-                  ),
-   'makecomat3D' : (None,
-                  [array_3d_int, array_3d_int, 
-                   c_int, c_int, c_int,
-                   array_1d_int,
-                   c_int,
-                   array_2d_int],
-                  ),
-   'makecomat4D' : (None,
-                  [array_4d_int, array_4d_int, 
-                   c_int, c_int, c_int, c_int,
-                   array_1d_int,
-                   c_int,
-                   array_2d_int],
-                  ),
-   'makecomat1D_2T' : (None,
-                     [array_1d_int, array_1d_int,
-                      c_int,
-                      array_1d_int, array_1d_int,
-                      c_int,
-                      array_1d_int,
-                      c_int, c_int,
-                      array_2d_int],
-                  ),
-   'makecomat2D_2T' : (None,
-                     [array_2d_int, array_2d_int,
-                      c_int, c_int,
-                      array_2d_int, array_2d_int,
-                      c_int, c_int,
-                      array_1d_int,
-                      c_int, c_int,
-                      array_2d_int],
-                  ),
-   'makecomat3D_2T' : (None,
-                     [array_3d_int, array_3d_int,
-                      c_int, c_int, c_int,
-                      array_3d_int, array_3d_int,
-                      c_int, c_int, c_int,
-                      array_1d_int,
-                      c_int, c_int,
-                      array_2d_int],
-                  ),
-   'makecomat4D_2T' : (None,
-                     [array_4d_int, array_4d_int,
-                      c_int, c_int, c_int, c_int,
-                      array_4d_int, array_4d_int,
-                      c_int, c_int, c_int, c_int,
-                      array_1d_int,
-                      c_int,c_int,
-                      array_2d_int],
-                  )
+    'makecomat1D': (None,
+                    [array_1d_int,
+                     array_1d_int,
+                     c_int,
+                     array_1d_int,
+                     c_int,
+                     array_2d_int],
+    ),
+    'makecomat2D': (None,
+                    [array_2d_int, array_2d_int,
+                     c_int, c_int,
+                     array_1d_int,
+                     c_int,
+                     array_2d_int],
+    ),
+    'makecomat3D': (None,
+                    [array_3d_int, array_3d_int,
+                     c_int, c_int, c_int,
+                     array_1d_int,
+                     c_int,
+                     array_2d_int],
+    ),
+    'makecomat4D': (None,
+                    [array_4d_int, array_4d_int,
+                     c_int, c_int, c_int, c_int,
+                     array_1d_int,
+                     c_int,
+                     array_2d_int],
+    ),
+    'makecomat1D_2T': (None,
+                       [array_1d_int, array_1d_int,
+                        c_int,
+                        array_1d_int, array_1d_int,
+                        c_int,
+                        array_1d_int,
+                        c_int, c_int,
+                        array_2d_int],
+    ),
+    'makecomat2D_2T': (None,
+                       [array_2d_int, array_2d_int,
+                        c_int, c_int,
+                        array_2d_int, array_2d_int,
+                        c_int, c_int,
+                        array_1d_int,
+                        c_int, c_int,
+                        array_2d_int],
+    ),
+    'makecomat3D_2T': (None,
+                       [array_3d_int, array_3d_int,
+                        c_int, c_int, c_int,
+                        array_3d_int, array_3d_int,
+                        c_int, c_int, c_int,
+                        array_1d_int,
+                        c_int, c_int,
+                        array_2d_int],
+    ),
+    'makecomat4D_2T': (None,
+                       [array_4d_int, array_4d_int,
+                        c_int, c_int, c_int, c_int,
+                        array_4d_int, array_4d_int,
+                        c_int, c_int, c_int, c_int,
+                        array_1d_int,
+                        c_int, c_int,
+                        array_2d_int],
+    )
 }
 
 
-def register_api(lib,api):
+def register_api(lib, api):
     for f, (restype, argtypes) in api.items():
         func = getattr(lib, f)
         func.restype = restype
         func.argtypes = argtypes
 
-register_api(_comat,libmakecomat_api)
+
+register_api(_comat, libmakecomat_api)
 
 
 # "Overload" co-occurence matrix calculators
@@ -226,7 +228,7 @@ def comat(image, mask, coords, levels=255):
         _comat.makecomat1D(image, mask,
                            image.shape[0],
                            coords,
-                           levels,out)
+                           levels, out)
     if dims == 2:
         assert image.ndim == 2
         assert image.min() >= 0
@@ -234,13 +236,13 @@ def comat(image, mask, coords, levels=255):
         assert mask.ndim == 2
         image = image.astype(c_int)
         mask = mask.astype(c_int)
-        coords = np.asarray(coords,dtype=c_int)
+        coords = np.asarray(coords, dtype=c_int)
         assert len(coords) == 2
         _comat.makecomat2D(image, mask,
                            image.shape[0],
                            image.shape[1],
                            coords,
-                           levels,out)
+                           levels, out)
     if dims == 3:
         assert image.ndim == 3
         assert image.min() >= 0
@@ -255,7 +257,7 @@ def comat(image, mask, coords, levels=255):
                            image.shape[1],
                            image.shape[2],
                            coords,
-                           levels,out)
+                           levels, out)
     if dims == 4:
         assert image.ndim == 4
         assert image.min() >= 0
@@ -271,7 +273,7 @@ def comat(image, mask, coords, levels=255):
                            image.shape[2],
                            image.shape[3],
                            coords,
-                           levels,out)
+                           levels, out)
     return out
 
 
@@ -354,7 +356,7 @@ def comat_2T(image1, mask1, image2, mask2, coords, levels1=255, levels2=255):
 
     """
     dims = len(image1.shape)
-    out = np.zeros((levels1,levels2),dtype=c_int)
+    out = np.zeros((levels1, levels2), dtype=c_int)
     if dims == 1:
         assert image1.ndim == 1
         assert image1.min() >= 0
@@ -370,10 +372,10 @@ def comat_2T(image1, mask1, image2, mask2, coords, levels1=255, levels2=255):
         mask2 = mask2.astype(c_int)
         coords = np.asarray(coords, dtype=c_int)
         assert len(coords) == 1
-        _comat.makecomat1D_2T(image1,mask1,
+        _comat.makecomat1D_2T(image1, mask1,
                               image1.shape[0],
                               image2, mask2,
-                              image2.shape[0],     
+                              image2.shape[0],
                               coords,
                               levels1, levels2,
                               out)
@@ -395,9 +397,9 @@ def comat_2T(image1, mask1, image2, mask2, coords, levels1=255, levels2=255):
         _comat.makecomat2D_2T(image1, mask1,
                               image1.shape[0],
                               image1.shape[1],
-                              image2,mask2,
+                              image2, mask2,
                               image2.shape[0],
-                              image2.shape[1],    
+                              image2.shape[1],
                               coords,
                               levels1, levels2,
                               out)
@@ -440,26 +442,26 @@ def comat_2T(image1, mask1, image2, mask2, coords, levels1=255, levels2=255):
         mask1 = mask1.astype(c_int)
         image2 = image2.astype(c_int)
         mask2 = mask2.astype(c_int)
-        coords = np.asarray(coords,dtype=c_int)
+        coords = np.asarray(coords, dtype=c_int)
         assert len(coords) == 4
-        _comat.makecomat4D_2T(image1,mask1,
+        _comat.makecomat4D_2T(image1, mask1,
                               image1.shape[0],
                               image1.shape[1],
                               image1.shape[2],
                               image1.shape[3],
-                              image2,mask2,
+                              image2, mask2,
                               image2.shape[0],
                               image2.shape[1],
                               image2.shape[2],
                               image2.shape[3],
                               coords,
-                              levels1,levels2,
+                              levels1, levels2,
                               out)
 
     return out
 
 
-def cmad(images,masks,distance,angles,levels):
+def cmad(images, masks, distance, angles, levels):
     """
     Uses the comat or comat_2T functions to generate co-ocurence
     matrices at the specified anlge(s) and distance(s) provided, 
@@ -500,29 +502,29 @@ def cmad(images,masks,distance,angles,levels):
     # Calculate integer offsets
     # 2D - angles[0] is traditionally labeled theta
     # 3D - angles[0] is traditionally labeled theta (from z-axis)
-    #      angles[1] is traditionally labeled phi (in x-y plane)
+    # angles[1] is traditionally labeled phi (in x-y plane)
     angs = len(angles)
-    if angs == 1: # 2D
-        assert len(images[0].shape) == 2 # Expect 2 dimensional array(s)
+    if angs == 1:  # 2D
+        assert len(images[0].shape) == 2  # Expect 2 dimensional array(s)
         xc = int(np.floor(np.cos(angles[0]) * distance + 0.5))
         yc = int(np.floor(np.sin(angles[0]) * distance + 0.5))
-        coords = [xc,yc]
-    if angs == 2: # 3D
-        assert len(images[0].shape) == 3 # Expect 3 dimensional array(s)
+        coords = [xc, yc]
+    if angs == 2:  # 3D
+        assert len(images[0].shape) == 3  # Expect 3 dimensional array(s)
         xc = int(np.floor(np.sin(angles[0]) * np.cos(angles[1]) * distance + 0.5))
         yc = int(np.floor(np.sin(angles[0]) * np.sin(angles[1]) * distance + 0.5))
         zc = int(np.floor(np.cos(angles[0]) * distance + 0.5))
-        coords = [xc,yc,zc]
+        coords = [xc, yc, zc]
     if angs > 3:
         print("cmad can't handle dimensions greater than 3 yet...")
         sys.exit(-1)
-    tempnum = len(images) # Can only have 1 or 2 images/masks
+    tempnum = len(images)  # Can only have 1 or 2 images/masks
     assert tempnum >= 1
     assert tempnum < 3
     if tempnum == 1:
-        out = comat(images[0],masks[0],coords,levels = levels[0])
+        out = comat(images[0], masks[0], coords, levels=levels[0])
     if tempnum == 2:
         assert len(levels) == 2
-        out = comat_2T(images[0],masks[0], images[1],masks[1],coords,levels1 = levels[0],levels2 = levels[1])
-            
+        out = comat_2T(images[0], masks[0], images[1], masks[1], coords, levels1=levels[0], levels2=levels[1])
+
     return out
