@@ -5,6 +5,7 @@ GenTex is a Python module that compute texture features of data set (1D to 4D) b
 ### What is this repository for? ###
 
 The following variables (Haralick measures and epsilon machine related quantities) can be computed:
+
 * 'CM Entropy'
 * 'EM Entropy'
 * 'Statistical Complexity'
