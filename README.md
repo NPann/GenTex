@@ -13,8 +13,10 @@ Usage of the program (written is C):
 ./d6c_pk  inp  out
 
 where: 
-* inp     : name of the input image (files inp.hdr and inp.img corresponds to zhe input image)
-* out     : name of the output image (the pair of files out.hdr and out.img is generated)
+
+* inp : name of the input image (files inp.hdr and inp.img corresponds to zhe input image)
+* out : name of the output image (the pair of files out.hdr and out.img is generated)
+
 
 ### How do I get set up? ###
 
