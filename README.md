@@ -8,10 +8,10 @@ GenTex provides a number of the standard algorithms required for generating comp
 
 1. Generation of multidimensional feature spaces from multimodal 'image' data (i.e. multiple 'co-registered' 1,2,3, or 4 dimensional data sets, e.g. multiple 'co-registered' time series, multimodal image data, space/time data..) via the use of a set of image templates, including:
 
-* single voxels
-* linear sequences in cardinal directions (ref.)
-* notches in cardinal directions (ref.)
-* light cones in cardinal directions and 45 degree angles (ref.)
+    - single voxels
+    - linear sequences in cardinal directions (ref.)
+    - notches in cardinal directions (ref.)
+    - light cones in cardinal directions and 45 degree angles (ref.)
 
 2. Clustering methods for generating discrete ('grey') levels from the constructed feature space (the levels are then typically mapped to the original image space at the anchor points of the templates)
 
