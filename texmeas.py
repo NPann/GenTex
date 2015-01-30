@@ -136,7 +136,7 @@ class texmeas:
                               'state')
     betas -   array
               an array of 3 values, the lower limit, the upper limit and
-              the number of steps to use as the 'inverse tempaerature' range
+              the number of steps to use as the 'inverse temperature' range
               for estimating the multifractal spectrum from an epsilon machine
               - getting the range right for an 'arbitrary' epsilon machine is
               tricky and is expected to be reset over a number of trials before
