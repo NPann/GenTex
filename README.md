@@ -62,3 +62,6 @@ Journal of Statistical Physics 104 (2001) 819--881.
 ### How do I get set up? ###
 
 Compile the library using 'python setup.py build_ext -i' from the package root directory.
+
+### Who do I talk to? ###
+

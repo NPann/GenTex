@@ -1,10 +1,6 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Feb 19 15:35:04 2014
-
-@author: nicolaspannetier
-"""
-
+# gentex.sphere package
+#
+# routines for generating a list of coordinate offsets for various circle or sphere
 
 def circle_in(xm, ym, r):
     circ = []
@@ -132,15 +128,3 @@ def sphere(xm, ym, zm, r):
                             if x > 0:
                                 sphere.append([-x + xm, -y + ym, -z + zm])
     return sphere
-
-    ## circ = bres_circle(0,0,1)
-    ## print circ
-    ## shell = sphere_shell(0,0,0,1)
-    ## print shell,len(shell)
-
-    ## sph = sphere(0,0,0,2)
-    ## print sph
-    ## print len(sph)
-    ## sph2 = rem_dup(sph)
-    ## print sph2
-    ## print len(sph2)

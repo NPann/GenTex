@@ -280,7 +280,7 @@ def comat(image, mask, coords, levels=255):
 # "Overload" 2 image co-occurence matrix calculators
 def comat_2T_mult(image1, mask1, image2, mask2, coordset, levels1=255, levels2=255):
     """
-    Generates and sums co-occurrence histogramss from 2 images given a
+    Generates and sums co-occurrence histograms from 2 images given a
     set of offsets.
 
     Parameters
@@ -463,7 +463,7 @@ def comat_2T(image1, mask1, image2, mask2, coords, levels1=255, levels2=255):
 
 def cmad(images, masks, distance, angles, levels):
     """
-    Uses the comat or comat_2T functions to generate co-ocurence
+    Uses the comat or comat_2T functions to generate co-occurence
     matrices at the specified anlge(s) and distance(s) provided, 
     which is more in the spirit of the original Haralick papers
     on texture analysis. So far this only makes sense for 2 and 3

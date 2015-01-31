@@ -454,7 +454,7 @@ class texmeas:
                     for i in range(self.comat.shape[0]):
                         if colprobs[i] != 0.0:
                             self.prl += ((colprobs[i] - self.comat[i, i]) ** 2 * (
-                            self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
+                                self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
             self.val = self.prl
             self.currval = "Probability of Run Length"
 
@@ -471,7 +471,7 @@ class texmeas:
                         colprobs[i] = np.sum(self.emmat[i, :])
                     for i in range(self.emmat.shape[0]):
                         self.erl += ((colprobs[i] - self.emmat[i, i]) ** 2 * (self.emmat[i, i] ** (self.rllen - 1))) / (
-                        colprobs[i] ** self.rllen)
+                            colprobs[i] ** self.rllen)
             self.val = self.erl
             self.currval = "Epsilon Machine Run Length"
 
@@ -490,10 +490,10 @@ class texmeas:
                     for i in range(self.comat.shape[0]):
                         if colprobs[i] != 0.0:
                             colval += ((colprobs[i] - self.comat[i, i]) ** 2 * (
-                            self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
+                                self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
                         if rowprobs[i] != 0.0:
                             rowval += ((rowprobs[i] - self.comat[i, i]) ** 2 * (
-                            self.comat[i, i] ** (self.rllen - 1))) / (rowprobs[i] ** self.rllen)
+                                self.comat[i, i] ** (self.rllen - 1))) / (rowprobs[i] ** self.rllen)
                     self.rla = np.abs(colval - rowval)
             self.val = self.rla
             self.currval = "Run Length Asymetry"
@@ -702,7 +702,7 @@ class texmeas:
                                 # check if rows ("distributions") are "close"
                                 # i.e. p value in chi squred test < self.clusp
                                 tester = \
-                                ss.chisquare(self.totcount * self.condo[:, i], self.totcount * self.condo[:, j])[1]
+                                    ss.chisquare(self.totcount * self.condo[:, i], self.totcount * self.condo[:, j])[1]
                                 if tester < self.clusp:  # they're different
                                     found.append(j)
                                     onclass += 1
