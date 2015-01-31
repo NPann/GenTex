@@ -5,7 +5,7 @@
 import numpy as np
 
 
-class texmeas:
+class Texmeas:
     """
     Class texmeas for generating texture measures from co-occurence
     matrix
