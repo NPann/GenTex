@@ -2,7 +2,7 @@ from os.path import join, dirname
 
 
 def configuration(parent_package='', top_path=None,
-                  package_name='gentex'):
+                  package_name='comat'):
     from numpy.distutils.misc_util import Configuration
 
     config = Configuration(package_name, parent_package, top_path)
