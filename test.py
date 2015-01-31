@@ -1,3 +1,7 @@
+"""
+Simple test function that test simple functionality of GenTex.
+"""
+
 import numpy as np
 import gentex
 
