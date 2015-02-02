@@ -1,4 +1,4 @@
-# gentex.feature package
+# gentex.features package
 #
 # note - what's in init should be rewritten in C similar to makecomat.c
 # for a significant speed increase - current question is how
@@ -8,7 +8,7 @@
 import numpy as np
 
 
-class features:
+class Features:
     """
     Class features for generating and manipulating feature spaces
 
