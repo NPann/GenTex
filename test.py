@@ -61,42 +61,59 @@ def test_cooccurence_4D():
     gentex.comat.comat_2T(D, maskD, D, maskD, offset4, levels1=3, levels2=3)
     print("DONE")
 
+
 def test_features_measure():
-    print("Texture measure... ")
+    print("Texture measure... ", end='')
 
     # Complexity/Texture measures to compute
-    texm = ["CM Entropy", "EM Entropy", "Statistical Complexity", "Energy Uniformity", "Maximum Probability", "Contrast",
-            "Inverse Difference Moment", "Correlation", "Homogeneity", "Cluster Tendency", "Multifractal Spectrum"]
+    texm = ['CM Entropy',
+           'EM Entropy',
+           'Statistical Complexity',
+           'Energy Uniformity',
+           'Maximum Probability',
+           'Contrast',
+           'Inverse Difference Moment',
+           'Correlation',
+           'Probability of Run Length',
+           'Epsilon Machine Run Length',
+           'Run Length Asymetry',
+           'Homogeneity',
+           'Cluster Tendency',
+           'Multifractal Spectrum Energy Range',
+           'Multifractal Spectrum Entropy Range'
+           ]
 
     # Random image
-    A = np.random.randint(3, size=[20, 20, 20])
+    im = np.random.randint(3, size=[40, 40])
 
     # Make mask - use threshold re. adding gm + wm + csf
-    tissmask = np.where(A > 0, 1, 0)
+    mask = np.where(im >= 0, 1, 0)
 
-    # Make a cumulative cooccurence array using a template consisting of a box surrounding the voxel
-    # Same as explicit form: boxindices = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
-    boxindices = gentex.template.Template("RectBox", [3, 3, 3], 3, False).offsets
+    # Make a cumulative co-occurrence array using a template consisting of a box surrounding the voxel
+    # Same as explicit form: box_indices = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+    box_indices = gentex.template.Template("RectBox", [3, 3, 3], 2, False).offsets
 
     # Build cooccurence matrix
-    comat = gentex.comat.comat_mult(A, tissmask, boxindices, levels=3)
+    comat = gentex.comat.comat_mult(im, mask, box_indices, levels=3)
 
     # Compute texture measures
     mytex = gentex.texmeas.Texmeas(comat)
 
-    # Add complexty/texture values to partline
-    # First set boiler plate values in mytex in case those textures are requried
+    # Add complexty/texture parameters to compute specific measures (can also be defined when constructing
+    # an instance of Texmeas)
     # Coordinate moment for "Contrast" and "Inverse Difference Moment"
     mytex.coordmom = 2
     # Probability moment for "Contrast" and "Inverse Difference Moment"
     mytex.probmom = 2
     # Cluster moment for "Cluster Tendency"
     mytex.clusmom = 2
+    # Run length for "Probability of Run Length", "Epsilon Machine Run Length" and "Run Length Asymetry"
+    mytex.rllen = 0.1
 
+    print("DONE")
     for meas in texm:
         mytex.calc_measure(meas)
-        print(meas, '= ', mytex.val)
-    print("DONE")
+        print('\t', meas, '= ', mytex.val)
 
 
 if __name__ == '__main__':
@@ -107,4 +124,4 @@ if __name__ == '__main__':
     test_cooccurence_4D()
     test_features_measure()
 
-    print("TEST..PASS")
+    print("PASS")
