@@ -19,21 +19,21 @@ GenTex provides a number of the standard algorithms required for generating comp
 4. Estimation of various complexity/texture measures from the co-occurrence matrices.
 (Haralick measures and epsilon machine related quantities) such as:
 
-    - 'CM Entropy'
+    - CM Entropy
     - EM Entropy'
-    - Statistical Complexity'
-    - Energy Uniformity'
-    - Maximum Probability'
-    - Contrast'
-    - Inverse Difference Moment'
-    - Correlation'
-    - Probability of Run Length'
-    - Epsilon Machine Run Length'
-    - Run Length Asymetry'
-    - Homogeneity'
-    - Cluster Tendency'
-    - Multifractal Spectrum Energy Range'
-    - Multifractal Spectrum Entropy Range'
+    - Statistical Complexity
+    - Energy Uniformity
+    - Maximum Probability
+    - Contrast
+    - Inverse Difference Moment
+    - Correlation
+    - Probability of Run Length
+    - Epsilon Machine Run Length
+    - Run Length Asymmetry
+    - Homogeneity
+    - Cluster Tendency
+    - Multifractal Spectrum Energy Range
+    - Multifractal Spectrum Entropy Range
 
 References:
 

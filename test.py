@@ -76,7 +76,7 @@ def test_features_measure():
            'Correlation',
            'Probability of Run Length',
            'Epsilon Machine Run Length',
-           'Run Length Asymetry',
+           'Run Length Asymmetry',
            'Homogeneity',
            'Cluster Tendency',
            'Multifractal Spectrum Energy Range',

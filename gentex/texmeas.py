@@ -89,7 +89,7 @@ class Texmeas:
                'Correlation'
                'Probability of Run Length'
                'Epsilon Machine Run Length'
-               'Run Length Asymetry'
+               'Run Length Asymmetry'
                'Homogeneity'
                'Cluster Tendency'
                'Multifractal Spectrum Energy Range'
@@ -114,7 +114,7 @@ class Texmeas:
                length of run length used for generating probability
                of a run length (the higher this probability the
                larger the constant patches on the scale used for generating
-               the cooccurence matrix) or the epsilon machine run length
+               the co-occurence matrix) or the epsilon machine run length
                
                default = 0
 
@@ -192,7 +192,7 @@ class Texmeas:
     cor -       Correlation
     prl -       Probability of Run Length
     erl -       Epsilon Machine Run Length
-    rla -       Run Length Asymetry
+    rla -       Run Length Asymmetry
     hom -       Homogeneity
     clt -       Cluster Tendency
     mfu -       Multifractal Spectrum Energy Range
@@ -251,7 +251,7 @@ class Texmeas:
         self.cor = np.nan  # Correlation
         self.prl = np.nan  # Probability of Run Length
         self.erl = np.nan  # Epsilon Machine Run Length
-        self.rla = np.nan  # Run Length Asymetry
+        self.rla = np.nan  # Run Length Asymmetry
         self.hom = np.nan  # Homogeneity
         self.clt = np.nan  # Cluster Tendency
         self.mfu = np.nan  # Multifractal max,min energy diff.
@@ -286,7 +286,7 @@ class Texmeas:
         'Correlation'
         'Probability of Run Length'
         'Epsilon Machine Run Length'
-        'Run Length Asymetry'
+        'Run Length Asymmetry'
         'Homogeneity'
         'Cluster Tendency'
         'Multifractal Spectrum Energy Range'
@@ -475,10 +475,10 @@ class Texmeas:
             self.val = self.erl
             self.currval = "Epsilon Machine Run Length"
 
-        elif self.measure == "Run Length Asymetry":
+        elif self.measure == "Run Length Asymmetry":
             if np.isnan(self.rla):
                 if self.rllen == 0:
-                    print("Nonzero run length is required for calculating Run Length Asymetry")
+                    print("Nonzero run length is required for calculating Run Length Asymmetry")
                 else:
                     colprobs = np.zeros(self.comat.shape[0])
                     rowprobs = np.zeros(self.comat.shape[0])
@@ -496,7 +496,7 @@ class Texmeas:
                                 self.comat[i, i] ** (self.rllen - 1))) / (rowprobs[i] ** self.rllen)
                     self.rla = np.abs(colval - rowval)
             self.val = self.rla
-            self.currval = "Run Length Asymetry"
+            self.currval = "Run Length Asymmetry"
 
         elif self.measure == "Homogeneity":
             if np.isnan(self.hom):
