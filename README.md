@@ -20,7 +20,7 @@ GenTex provides a number of the standard algorithms required for generating comp
 (Haralick measures and epsilon machine related quantities) such as:
 
     - CM Entropy
-    - EM Entropy'
+    - EM Entropy
     - Statistical Complexity
     - Energy Uniformity
     - Maximum Probability
