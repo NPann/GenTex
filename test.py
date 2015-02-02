@@ -129,7 +129,7 @@ def test_cluster_features():
     print("DONE")
 
 
-def test_features_measure():
+def test_texture_measure():
     print("Texture measure... ", end='')
 
     # Complexity/Texture measures to compute
@@ -202,6 +202,6 @@ if __name__ == '__main__':
 
     test_cluster_features()
 
-    test_features_measure()
+    test_texture_measure()
 
     print("PASS")
