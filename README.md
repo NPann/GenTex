@@ -70,7 +70,7 @@ Compile the library using 'python setup.py build_ext -i' from the gentex subdire
 
 ### Who do I talk to? ###
 
-This module was developed by Karl Young and refactored by Nicolas Pannetier.
+This module was developed mostly by Karl Young and refactored by Norbert Schuff and Nicolas Pannetier.
 
 ### License ###
 
