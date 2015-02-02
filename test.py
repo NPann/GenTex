@@ -118,6 +118,7 @@ def test_features_measure():
 
 if __name__ == '__main__':
     print("TEST...")
+    
     test_cooccurence_1D()
     test_cooccurence_2D()
     test_cooccurence_3D()
