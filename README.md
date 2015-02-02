@@ -2,6 +2,7 @@
 
 The GenTex or general texture analysis package provides a suite of routines that combines standard texture analysis methods and entropy/statistical complexity analysis methods.
 
+
 ### What is this repository for? ###
 
 GenTex provides a number of the standard algorithms required for generating complexity/texture measure estimates from multimodal imaging data. These include:
@@ -65,15 +66,18 @@ Compile the C-library using 'python setup.py build_ext -i' from the gentex subdi
 Run test.py to test GenTex functionality.
 Check test_texture_measure() in test.py to get started and write your own scripts.
 
+
 ### Requirements ###
 
 * Python 3.x or superior
 * Numpy 
 * Scipy
 
+
 ### Who do I talk to? ###
 
 This module was developed by Karl Young and refactored by Norbert Schuff and Nicolas Pannetier.
+
 
 ### License ###
 
