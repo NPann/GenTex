@@ -101,10 +101,10 @@ class Features:
         # Make sure images and mask have same dimension
         self.dims = images[0].shape
         assert len(self.dims) == len(self.mask.shape)
-        # same for images and template
+        # # same for images and template
         assert len(self.dims) == len(template[0])
 
-        # Determinxe number of features
+        # Determine number of features
         self.numfeats = len(template) * len(images)
 
         # Get upper and lower bounds in image to grab
@@ -120,7 +120,7 @@ class Features:
         # Get feature space co-ordinate array, fsc;
         # already determined by image parsing limits uplim,lowlim
         ind = np.indices(uplim - lowlim)
-        # self.fsc = np.transpose(np.array([np.ravel(ind[i]+lowlim[i]) for i in range(len(lowlim))]))
+
         self.fsc = np.array([np.ravel(ind[i] + lowlim[i]) for i in range(len(lowlim))], dtype=np.int16)
         # Now get feature space columns, i.e. each column is
         # a combination of image + template element
