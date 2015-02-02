@@ -3,7 +3,7 @@
 # note - what's in init should be rewritten in C similar to makecomat.c
 # for a significant speed increase - current question is how
 # to handle the possibility of being handed a variable number
-#        of images and the mask to build the feature space with, using cytypes
+# of images and the mask to build the feature space with, using cytypes
 
 import numpy as np
 

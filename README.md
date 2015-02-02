@@ -65,8 +65,8 @@ Compile the library using 'python setup.py build_ext -i' from the gentex subdire
 
 ### Requirements ###
 
-Python 3.x or superior
-Numpy 
+* Python 3.x or superior
+* Numpy 
 
 ### Who do I talk to? ###
 
