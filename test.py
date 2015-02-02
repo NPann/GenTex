@@ -3,6 +3,7 @@ Simple script for testing and demonstrating GenTex functionality.
 """
 
 import numpy as np
+from scipy import misc
 import gentex
 
 
@@ -105,62 +106,7 @@ def test_cooccurence_mult():
     print("DONE")
 
 
-def test_features_measure():
-    print("Texture measure... ", end='')
-
-    # Complexity/Texture measures to compute
-    texm = ['CM Entropy',
-            'EM Entropy',
-            'Statistical Complexity',
-            'Energy Uniformity',
-            'Maximum Probability',
-            'Contrast',
-            'Inverse Difference Moment',
-            'Correlation',
-            'Probability of Run Length',
-            'Epsilon Machine Run Length',
-            'Run Length Asymmetry',
-            'Homogeneity',
-            'Cluster Tendency',
-            'Multifractal Spectrum Energy Range',
-            'Multifractal Spectrum Entropy Range']
-
-    # Random image
-    im = np.random.randint(3, size=[40, 40])
-
-    # Make mask - use threshold re. adding gm + wm + csf
-    mask = np.where(im >= 0, 1, 0)
-
-    # Make a cumulative co-occurrence array using a template consisting of a box surrounding the voxel
-    # Same as explicit form: box_indices = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
-    box_indices = gentex.template.Template("RectBox", [3, 3, 3], 2, False).offsets
-
-    # Build cooccurence matrix
-    comat = gentex.comat.comat_mult(im, mask, box_indices, levels=3)
-
-    # Compute texture measures
-    mytex = gentex.texmeas.Texmeas(comat)
-
-    # Add complexty/texture parameters to compute specific measures (can also be defined when constructing
-    # an instance of Texmeas)
-    # Coordinate moment for "Contrast" and "Inverse Difference Moment"
-    mytex.coordmom = 2
-    # Probability moment for "Contrast" and "Inverse Difference Moment"
-    mytex.probmom = 2
-    # Cluster moment for "Cluster Tendency"
-    mytex.clusmom = 2
-    # Run length for "Probability of Run Length", "Epsilon Machine Run Length" and "Run Length Asymetry"
-    mytex.rllen = 0.1
-
-    print("DONE")
-    for meas in texm:
-        mytex.calc_measure(meas)
-        print('\t', meas, '= ', mytex.val)
-
-
 def test_cluster_features():
-
-    from scipy import misc
 
     print("Clustering... ", end='')
 
@@ -181,6 +127,64 @@ def test_cluster_features():
     fe.clusfs(numclus=4)
 
     print("DONE")
+
+
+def test_features_measure():
+    print("Texture measure... ", end='')
+
+    # Complexity/Texture measures to compute
+    texm = ['CM Entropy',
+            'EM Entropy',
+            'Statistical Complexity',
+            'Energy Uniformity',
+            'Maximum Probability',
+            'Contrast',
+            'Inverse Difference Moment',
+            'Correlation',
+            'Probability of Run Length',
+            'Epsilon Machine Run Length',
+            'Run Length Asymmetry',
+            'Homogeneity',
+            'Cluster Tendency',
+            'Multifractal Spectrum Energy Range',
+            'Multifractal Spectrum Entropy Range']
+
+    # Load image
+    im = misc.imread('test_image.png')
+
+    # Make mask - use threshold re. adding gm + wm + csf
+    mask = np.where(im >= 0, 1, 0)
+
+    # Make a cumulative co-occurrence array using a template consisting of a box surrounding the voxel
+    # Same as explicit form: box_indices = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+    box_indices = gentex.template.Template("RectBox", [3, 3, 3], 2, False).offsets
+
+    # Quantilize images
+    levels = 4
+    fe = gentex.features.Features([im], mask, box_indices)
+    fe.clusfs(numclus=levels)
+
+    # Build cooccurence matrix
+    comat = gentex.comat.comat_mult(fe.clusim, mask, box_indices, levels=levels)
+
+    # Compute texture measures
+    mytex = gentex.texmeas.Texmeas(comat)
+
+    # Add complexty/texture parameters to compute specific measures (can also be defined when constructing
+    # an instance of Texmeas)
+    # Coordinate moment for "Contrast" and "Inverse Difference Moment"
+    mytex.coordmom = 2
+    # Probability moment for "Contrast" and "Inverse Difference Moment"
+    mytex.probmom = 2
+    # Cluster moment for "Cluster Tendency"
+    mytex.clusmom = 2
+    # Run length for "Probability of Run Length", "Epsilon Machine Run Length" and "Run Length Asymetry"
+    mytex.rllen = 0.1
+
+    print("DONE")
+    for meas in texm:
+        mytex.calc_measure(meas)
+        print('\t', meas, '= ', mytex.val)
 
 
 if __name__ == '__main__':
