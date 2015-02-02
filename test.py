@@ -159,12 +159,12 @@ def test_texture_measure():
     # Same as explicit form: box_indices = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
     box_indices = gentex.template.Template("RectBox", [3, 3, 3], 2, False).offsets
 
-    # Quantilize images
+    # Cluster image in bins/levels (i.e data quantization)
     levels = 4
     fe = gentex.features.Features([im], mask, box_indices)
     fe.clusfs(numclus=levels)
 
-    # Build cooccurence matrix
+    # Build cooccurrence matrix
     comat = gentex.comat.comat_mult(fe.clusim, mask, box_indices, levels=levels)
 
     # Compute texture measures

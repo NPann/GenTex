@@ -61,7 +61,9 @@ Journal of Statistical Physics 104 (2001) 819--881.
 
 ### How do I get set up? ###
 
-Compile the library using 'python setup.py build_ext -i' from the gentex subdirectory.
+Compile the C-library using 'python setup.py build_ext -i' from the gentex subdirectory.
+Run test.py to test GenTex functionality.
+Check test_texture_measure() in test.py to get started and write your own scripts.
 
 ### Requirements ###
 
