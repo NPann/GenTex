@@ -7,7 +7,7 @@ from scipy import misc
 import gentex
 
 
-def test_cooccurence_1d():
+def test_cooccurrence_1d():
     print("Co-occurrence 1D... ", end="")
 
     # Generate test data
@@ -28,7 +28,7 @@ def test_cooccurence_1d():
     print("DONE")
 
 
-def test_cooccurence_2d():
+def test_cooccurrence_2d():
     print("Co-occurrence 2D... ", end="")
 
     # Generate test data
@@ -51,7 +51,7 @@ def test_cooccurence_2d():
     print("DONE")
 
 
-def test_cooccurence_3d():
+def test_cooccurrence_3d():
     print("Co-occurrence 3D... ", end="")
 
     C = np.random.randint(3, size=[5, 5, 5])
@@ -71,7 +71,7 @@ def test_cooccurence_3d():
     print("DONE")
 
 
-def test_cooccurence_4d():
+def test_cooccurrence_4d():
     print("Co-occurrence 4D... ", end="")
 
     D = np.random.randint(3, size=[3, 3, 3, 3])
@@ -87,7 +87,7 @@ def test_cooccurence_4d():
     print("DONE")
 
 
-def test_cooccurence_mult():
+def test_cooccurrence_mult():
     print("Co-occurrence with multiple offsets... ", end="")
 
     # Generate test data
@@ -190,15 +190,15 @@ def test_texture_measure():
 if __name__ == '__main__':
     print("TEST...")
 
-    test_cooccurence_1d()
+    test_cooccurrence_1d()
 
-    test_cooccurence_2d()
+    test_cooccurrence_2d()
 
-    test_cooccurence_3d()
+    test_cooccurrence_3d()
 
-    test_cooccurence_4d()
+    test_cooccurrence_4d()
 
-    test_cooccurence_mult()
+    test_cooccurrence_mult()
 
     test_cluster_features()
 
