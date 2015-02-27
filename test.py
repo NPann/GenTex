@@ -153,11 +153,11 @@ def test_texture_measure():
     im = misc.imread('test_image.png')
 
     # Make mask - use threshold re. adding gm + wm + csf
-    mask = np.where(im >= 0, 1, 0)
+    mask = np.where(im > 0, 1, 0)
 
     # Make a cumulative co-occurrence array using a template consisting of a box surrounding the voxel
     # Same as explicit form: box_indices = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
-    box_indices = gentex.template.Template("RectBox", [3, 3, 3], 2, False).offsets
+    box_indices = gentex.template.Template("RectBox", [7, 7, 7], 2, False).offsets
 
     # Cluster image in bins/levels (i.e data quantization)
     levels = 4
@@ -187,6 +187,53 @@ def test_texture_measure():
         print('\t', meas, '= ', mytex.val)
 
 
+def test_texture_measure_voxel_wise():
+    print("Texture measure voxel wise... ", end='')
+
+    # Complexity/Texture measures to compute
+    texm = ['CM Entropy']
+
+    # Load image
+    im = misc.imread('test_image.png')
+
+    # Downsampling for testing
+    im = misc.imresize(im, 1/4)
+
+    # Make mask - use threshold re. adding gm + wm + csf
+    mask2 = np.where(im > 0, 1, 0)
+    idx, idy = np.where(mask2 == 1)
+    mask1 = np.zeros(im.shape, dtype=int)
+
+    # Initiate texture output
+    res = np.zeros(im.shape + (len(texm), ))
+
+    # Make a cumulative co-occurrence array using a template consisting of a box surrounding the voxel
+    # Same as explicit form: box_indices = [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]]
+    box_indices = gentex.template.Template("RectBox", [7, 7, 7], 2, False).offsets
+
+    # Data quantization
+    levels = 8
+    bins = np.linspace(im.min(), im.max(), levels + 1)
+    im_q = np.digitize(im.ravel(), bins).reshape(im.shape) - 1
+
+    for a, b in zip(idx, idy):
+        # set voxel of interest to 1
+        mask1[a, b] = 1
+        # Build co-occurrence matrix
+        comat = gentex.comat.comat_2T_mult(im_q, mask1, im_q, mask2, box_indices,
+                                           levels1=levels+1, levels2=levels+1)
+        # Compute texture measures
+        mytex = gentex.texmeas.Texmeas(comat)
+        for c, meas in enumerate(texm):
+            mytex.calc_measure(meas)
+            res[a, b, c] = mytex.val
+
+        # restore mask
+        mask1[a, b] = 0
+
+    print("DONE")
+
+
 if __name__ == '__main__':
     print("TEST...")
 
@@ -203,5 +250,7 @@ if __name__ == '__main__':
     test_cluster_features()
 
     test_texture_measure()
+
+    test_texture_measure_voxel_wise()
 
     print("PASS")
