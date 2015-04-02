@@ -1,0 +1,10 @@
+# Google Drive add-on
+Icon
+
+# Directories
+gentex/build
+gentex/venv
+gentex/__pycache__
+
+# compiled files
+*.so
