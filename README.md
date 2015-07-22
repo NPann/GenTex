@@ -71,7 +71,7 @@ python setup.py build_ext -i' from the gentex subdirectory.
 * Run test.py to check if GenTex is running.
 
 ``` bash
-./test.py
+python ./test.py
 ``` 
 
 * Check test_texture_measure() in test.py to get started and write your own scripts.
