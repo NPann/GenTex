@@ -86,7 +86,7 @@ python ./test.py
 
 ### Who do I talk to? ###
 
-This module was developed by Karl Young and refactored by Norbert Schuff and Nicolas Pannetier.
+This module was developed by Karl Young, Nicolas Pannetier and Norbert Schuff.
 
 
 ### License ###
