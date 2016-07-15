@@ -74,7 +74,7 @@ python setup.py build_ext -i
 python ./test.py
 ``` 
 
-* Check test_texture_measure() in test.py to get started and write your own scripts.
+* Have a pick at test_texture_measure() function in test.py to get started and write your own scripts.
 
 
 ### Requirements ###
