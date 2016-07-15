@@ -62,10 +62,10 @@ Journal of Statistical Physics 104 (2001) 819--881.
 
 ### How do I get set up? ###
 
-* Compile the C-library: 
+* Compile the C-library from the gentex subdirectory.
 
 ``` bash
-python setup.py build_ext -i' from the gentex subdirectory.
+python setup.py build_ext -i
 ``` 
 
 * Run test.py to check if GenTex is running.
