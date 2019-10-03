@@ -30,7 +30,7 @@ aliases:
     name: Build docker image
     no_output_timeout: 30m
     command: |
-      docker build -t ${DOCKER_IMAGE_NAME} -f Dockerfile \
+      docker build -t ${DOCKER_IMAGE_NAME} -f docker/Dockerfile \
       --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
       --build-arg VCS_REF=`git rev-parse --short HEAD` \
       --build-arg VERSION="${CIRCLE_TAG}" \
