@@ -1,97 +1,80 @@
-# gentex.template package
-#
-# routines for generating a list of coordinate offsets
-# for various template structures
+# routines for generating a list of coordinate offsets for various template structures
 
 import numpy as np
 
 
 class Template:
-    """
-    Class template for generating lists of template voxels
+    """Class template for generating lists of template voxels
 
-    Class Parameters
-    ----------------
+    Parameters
+    ----------
 
-    type - string
-           (required by constructor) - the type of template
-           currently available types are:
+    type: string
+        Required by constructor. The type of template currently available types are:
 
-    'RectBox' - rectangular box (1,2,3,4 dimensions)
-                template origin is center of box
-    'RectShell' - shell of rectangular box (1,2,3,4 dimensions)
-                template origin is center of shell
-    'Ellipsoid' - ellispoid (1,2,3,4 dimensions)
-                template origin is center of ellipsoid
-    'EllipsoidShell' - ellipsoidal shell (1,2,3,4 dimensions)
-                template origin is center of shell
-    'Line' - linear template
-                template origin is first point of line
-    'Notch' - notch template
-                template origin is point about which notch is built
-    'Cone' - cone template
-                template origin is start of half cone
-                
-    sizes - 1D int array (can be empty)
-            array of sizes required for constructing template (required
-            by constructor)
+            - 'RectBox' - rectangular box (1,2,3,4 dimensions) template origin is center of box
 
-    dimension - int
-                dimension of template (required by constructor)
+            - 'RectShell' - shell of rectangular box (1,2,3,4 dimensions) template origin is center of shell
 
-    inculsion - bool
-                whether or not to include anchor point (i.e. [0], [0,0],...)
-                (required by constructor)
-                
-    handedness - if there are axial asymetries in the template (e.g. Notch)
-                 can pass in a vector with +1 for 'right' and -1 for 'left'
-                 (default is [1], or [1,1], or...)
+            - 'Ellipsoid' - ellispoid (1,2,3,4 dimensions) template origin is center of ellipsoid
 
-    axbase - list of ints (each list of length = dimension)
-           basis vector specifying axis, when appropriate, for direction
-           of template (can be empty) - component lengths will be ignored;
-           only whether the component is zero or nonzero, and the sign will be
-           considered (i.e. only co-ordinate axes and '45 degree' lines
-           will be considered as template axes), so e.g.
-           
-           [1,0] ~ [10,0] ~ x-axis in 2D
-           [0,1,0] ~ [0,33,0] ~ y-axis in 3D
-           [1,-1] ~ [30,-20] ~ [108,-1] ~ 135 degree axis in 2D
-           
-           if axbase is empty template will pick
-           axes according to following conventions:
+            - 'EllipsoidShell' - ellipsoidal shell (1,2,3,4 dimensions) template origin is center of shell
 
-           - templates requiring single axis specification
-             (e.g. line, notch, cone) will always use
-             positive direction of first dimension
-           - templates requiring multiple axis specification, e.g.
-             rectangular parallelipipeds and ellipsoids will choose:
-               - largest dimension (e.g. semi-major axis) in positive
-                 direction of first dimension
-               - next largest dimension (e.g. semi-minor axis) in
-                 positive direction of second dimension
-               - etc.
+            - 'Line' - linear template template origin is first point of line
 
-    anchoff  - 'dimension' dimensional list of ints
-              offset of anchor point from template [0,0,0] in
-              template (usually assume [0,0,0])
+            - 'Notch' - notch template template origin is point about which notch is built
 
+            - 'Cone' - cone template template origin is start of half cone
 
-    shift -   'dimension' dimensional list of ints to use if you
-              want to shift all points in offset array - useful, e.g.
-              if you want to build cooccurence arrays from offset
-              templates - build one template (set of offsets with no shift
-              and another with an appropriate shift; those can each be passed
-              to the feature space cluster algorithm, then those
-              to the cooccurence matrix builder, and that to the texture  
-              measure generator.
+    sizes:  1D int array (can be empty)
+        Attributes of sizes required for constructing template
 
-    offsets - list of int lists of appropriate size
-              (based on dimension of template)
-              list of of offsets from anchor comprising set of template points
+    dimension: int
+        Dimension of template
+
+    inculsion: bool
+        Whether or not to include anchor point (i.e. [0], [0,0],...)
+
+    handedness: 1D int array
+        If there are axial asymetries in the template (e.g. Notch) can pass in a vector with +1 for 'right' and -1
+        for 'left' (default is [1], or [1,1], or...)
+
+    axbase: List of ints (each list of length = dimension)
+        Basis vector specifying axis, when appropriate, for direction of template (can be empty) - component lengths
+        will be ignored; only whether the component is zero or nonzero, and the sign will be
+        considered (i.e. only co-ordinate axes and '45 degree' lines will be considered as template axes), so e.g::
+
+            [1,0] ~ [10,0] ~ x-axis in 2D
+            [0,1,0] ~ [0,33,0] ~ y-axis in 3D
+            [1,-1] ~ [30,-20] ~ [108,-1] ~ 135 degree axis in 2
+
+        if axbase is empty template will pick axes according to following conventions:
+
+            - templates requiring single axis specification (e.g. line, notch, cone) will always use positivedirection of first dimension
+
+            - templates requiring multiple axis specification, e.g. rectangular parallelipipeds and ellipsoids will choose:
+
+                - largest dimension (e.g. semi-major axis) in positive direction of first dimension
+
+                - next largest dimension (e.g. semi-minor axis) in positive direction of second dimension
+
+                - etc.
+
+    anchoff: list of ints
+        Offset of anchor point from template [0,0,0] in template (usually assume [0,0,0])
+
+    shift: List of int
+        List of ints to use if you
+        want to shift all points in offset array - useful, e.g.
+        if you want to build cooccurence arrays from offset
+        templates - build one template (set of offsets with no shift
+        and another with an appropriate shift; those can each be passed
+        to the feature space cluster algorithm, then those
+        to the cooccurence matrix builder, and that to the texture
+        measure generator.
     """
 
-    def __init__(self, type, sizes, dimension, inclusion, handedness=[], axbase=[], anchoff=[], shift=[]):
+    def __init__(self, type, sizes, dimension, inclusion, handedness=None, axbase=None, anchoff=None, shift=None):
 
         self.type = type
         self.sizes = sizes
@@ -104,7 +87,7 @@ class Template:
         self.shift = shift
 
         # Set up default handedness
-        if self.handedness == []:  # Nothing passed in to constructor
+        if self.handedness is None:  # Nothing passed in to constructor
             if self.dim == 1:
                 self.handedness = [1]
             if self.dim == 2:
@@ -115,7 +98,7 @@ class Template:
                 self.handedness = [1, 1, 1, 1]
 
         # Set up default axis directions
-        if self.axbase == []:  # Nothing passed in to constructor
+        if self.axbase is None:  # Nothing passed in to constructor
             if self.dim == 1:
                 # pick convention for 1 dimension of positve = 1
                 # negative = -1
@@ -128,7 +111,7 @@ class Template:
                 self.axbase = [1, 0, 0, 0]
 
         # Set up anchor point offset
-        if self.anchoff == []:  # Nothing passed in to constructor
+        if self.anchoff is None:  # Nothing passed in to constructor
             if self.dim == 1:
                 self.anchoff = [0]
             if self.dim == 2:
@@ -139,7 +122,7 @@ class Template:
                 self.anchoff = [0, 0, 0, 0]
 
         # Set up shift
-        if self.shift == []:  # Nothing passed in to constructor
+        if self.shift is None:  # Nothing passed in to constructor
             if self.dim == 1:
                 self.shift = [0]
             if self.dim == 2:
@@ -152,9 +135,8 @@ class Template:
         ################# RECTBOX  #######################
         if type == "RectBox":
             if len(self.sizes) != self.dim:
-                print
-                "sizes array is of length ", len(self.sizes), "but must be of length ", self.dim, " for type ", type
-                # sys.exit(-1)
+                print(f"sizes array is of length {len(self.sizes)} but must be of length {self.dim} for type {type}")
+
             # Calculate box limits
             lims = np.zeros((self.dim, 2), int)
 
@@ -198,9 +180,7 @@ class Template:
         elif type == "RectShell":
 
             if len(self.sizes) != self.dim:
-                print
-                "sizes array is of length ", len(self.sizes), "but must be of length ", self.dim, " for type ", type
-                # sys.exit(-1)
+                print(f"sizes array is of length {len(self.sizes)} but must be of length {self.dim} for type {type}")
 
             if self.dim == 1:
                 sub = self.sizes[0] / 2
@@ -235,15 +215,15 @@ class Template:
                     for j in range(self.sizes[1]):
                         for k in range(self.sizes[2]):
                             for t in range(self.sizes[3]):
-                                if (i == 0 or i == self.sizes[0] - 1 or j == 0 or j == self.sizes[
-                                    1] - 1 or k == 0 or k == self.sizes[2] - 1 or t == 0 or t == self.sizes[3] - 1):
+                                if (i == 0 or i == self.sizes[0] - 1 or j == 0 or j == self.sizes[1] - 1 or
+                                        k == 0 or k == self.sizes[2] - 1 or t == 0 or t == self.sizes[3] - 1):
                                     self.offsets.append([i - sub0, j - sub1, k - sub2, t - sub3])
+
         ################# ELLIPSOID  #######################
         elif type == "Ellipsoid":
 
             if len(self.sizes) != self.dim:
-                print
-                "sizes array is of length ", len(self.sizes), "but must be of length ", self.dim, " for type ", type
+                print(f"sizes array is of length {len(self.sizes)} but must be of length {self.dim} for type {type}")
                 # sys.exit(-1)
 
             if self.dim == 1:  # same as 1D rectangular box
@@ -285,8 +265,7 @@ class Template:
         elif type == "EllipsoidShell":
 
             if len(self.sizes) != self.dim:
-                print
-                "sizes array is of length ", len(self.sizes), "but must be of length ", self.dim, " for type ", type
+                print(f"sizes array is of length {len(self.sizes)} but must be of length {self.dim} for type {type}")
                 # sys.exit(-1)
 
             if self.dim == 1:  # Same as 1D rectangular shell
@@ -323,17 +302,14 @@ class Template:
                                 self.offsets.append([i - sub0, j - sub1, k - sub2])  # out these bounds
 
             if self.dim == 4:
-                print
-                "Sorry 4D ellipsoidal shells not yet implemented"
+                print("Sorry 4D ellipsoidal shells not yet implemented")
                 # sys.exit(-1)
 
         #################  LINE  #######################
         elif type == "Line":
 
             if len(self.sizes) != 1:
-                print
-                "sizes array is of length ", len(self.sizes), "but must be of length 1 for type ", type
-                # sys.exit(-1)
+                print(f"sizes array is of length {len(self.sizes)} but must be of length {self.dim} for type {type}")
 
             proto = np.sign(self.axbase)  # Generate axis (rely on dimension
             # being correct re. above check)
@@ -344,9 +320,8 @@ class Template:
         elif type == "Notch":
 
             if len(self.sizes) != 1:
-                print
-                "self.sizes array is of length ", len(self.sizes), "but must be of length 1 for type ", type
-            # sys.exit(-1)
+                print(f"sizes array is of length {len(self.sizes)} but must be of length {self.dim} for type {type}")
+
             proto = list(np.sign(self.axbase))
             if self.dim == 1:
                 print
@@ -436,9 +411,8 @@ class Template:
             # currently only cones along coordinate axis are supported
 
             if len(self.sizes) != 1:
-                print
-                "sizes array is of length ", len(self.sizes), "but must be of length 1 for type ", type
-                # sys.exit(-1)
+                print(f"sizes array is of length {len(self.sizes)} but must be of length {self.dim} for type {type}")
+
             proto = list(np.sign(self.axbase))
 
             if self.dim == 1:
@@ -524,9 +498,7 @@ class Template:
                                     self.offsets.append([i, j, k, -t])
 
         else:
-            print
-            "Type ", type, " unknown"
-            # sys.exit(-1)
+            print(f"Type {type} unknow")
 
         for i in range(len(self.offsets)):
             self.offsets[i] = list(np.array(self.offsets[i]) + np.array(self.shift))
