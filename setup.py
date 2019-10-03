@@ -39,7 +39,7 @@ setup(
     author='GenTex contributors',
     url='https://github.com/NPann/GenTex',
     packages=find_packages(exclude=('tests')),
-    classifier=[
+    classifiers=[
         'Programming Language :: Python :: 3',
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
