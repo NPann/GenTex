@@ -65,13 +65,14 @@ aliases:
   - &create-volume-for-remote-mount
     name: Create volume for mounting to remote docker to deal with permission issue
     command: |
-      # create a dummy container which will hold a volume with config
-      docker run -it -d --mount 'type=volume,src=source,dst=/src/gentex' --name source-vol alpine /bin/sh
-      # copy a repo files into this volume
-      docker cp . source-vol:/src/gentex
+      # create a dummy container which will hold a volume with useful file
+      # This is required because circleci runs with uid=3434 whereas are docker image is on uid=1000
+      # And that's an issue for bringing back the files generated from withing the docker container (e.g. test, doc)
+      # to circleci instance for storing as artifacts
+      docker run -it -d --mount 'type=volume,src=source,dst=/src/gentex/artifacts' --name artifacts-vol alpine /bin/sh
       # change ownership to gentex (ID:1000) user
-      docker exec -it source-vol chown -R 1000:100 /src/gentex
-      docker exec -it source-vol ls -l /src/gentex
+      docker exec -it artifacts-vol chown -R 1000:100 /src/gentex/artifacts
+      docker exec -it artifacts-vol ls -l /src/gentex/artifacts
 
 
 jobs:
@@ -116,16 +117,12 @@ jobs:
       - run:
           name: Test
           command: |
-            docker run -it --volumes-from source-vol --name test ${DOCKER_IMAGE_NAME} pytest --junitxml=test-reports/junit.xml
-            docker cp test:/src/gentex/htmlcov .
-            docker cp test:/src/gentex/test-reports .
+            docker run -it --volumes-from artifacts-vol --name test ${DOCKER_IMAGE_NAME} pytest --junitxml=artifacts/junit.xml
+            docker cp test:/src/gentex/artifacts .
       - store_test_results:
-          path: test-reports
+          path: artifacts
       - store_artifacts:
-          path: test-reports
-      - store_artifacts:
-          path: htmlcov
-          prefix: coverage
+          path: artifacts
 
   build_doc:
     environment:
@@ -143,11 +140,11 @@ jobs:
       - run:
           name: Build doc
           command: |
-            docker run -it --volumes-from source-vol --name doc ${DOCKER_IMAGE_NAME} \
-              bash -c "cd doc/ && make html"
-            docker cp doc:/src/gentex/doc .
+            docker run -it --volumes-from artifacts-vol --name doc ${DOCKER_IMAGE_NAME} bash -c "cd doc/ && make html && \
+            cp -r _build /src/gentex/artifacts"
+            docker cp doc:/src/gentex/artifacts .
       - store_artifacts:
-          path: doc/_build/html
+          path: artifacts/_build/html
           prefix: doc
 
 
