@@ -6,12 +6,13 @@
     of the standard algorithms required for generating complexity/texture
     measure estimates from multimodal imaging data. These include:
     
-          1) Generation of multidimensional feature spaces
+          1. Generation of multidimensional feature spaces
              from multimodal 'image' data (i.e. multiple 'co-registered'
              1,2,3, or 4 dimensional data sets, e.g. multiple
              'co-registered' time series, multimodal image data,
              space/time data..) via the use of a set of image templates,
-             inculding:
+             including:
+
                 a) single voxels
                 b) linear sequences in cardinal directions
                    (ref.)
@@ -21,23 +22,24 @@
                    45 degree angles
                    (ref.)
 
-          2) Clustering methods for generating disrete ('grey') levels
+          2. Clustering methods for generating disrete ('grey') levels
              from the constructed feature space (the levels are then
              typically mapped to the original image space at the anchor
              points of the templates)
              
-          3) Building co-occurrence matrices from a discrete level 'image'
+          3. Building co-occurrence matrices from a discrete level 'image'
              or a pair of discrete level 'images', where the discrete level
              'images' are typically generated via feature space clustering
              of the original multimodal data sets (time series, images,
              space/time data...)
 
-          4) Estimation of various complexity/texture measures from the
+          4. Estimation of various complexity/texture measures from the
              co-occurrence matrices.
+
 """
 
 import sys
-
+from pathlib import Path
 import numpy as np
 
 
@@ -48,10 +50,11 @@ except:
     sys.exit(-1)
 
 try:
-    _comat = np.ctypeslib.load_library('libmakecomat_', __file__)
+    _comat = np.ctypeslib.load_library('_libmakecomat', Path(__file__).parents[1])
 except:
     print(
-        'Failed to load libmakecomat_.so.  Compile the library using python setup.py build_ext -i from the package root directory.')
+        'Failed to load _libmakecomat.so.  '
+        'Compile the library using python setup.py build_ext -i from the package root directory.')
     sys.exit(-1)
 
 array_1d_int = np.ctypeslib.ndpointer(dtype=np.intc, ndim=1,
@@ -154,21 +157,25 @@ def comat_mult(image, mask, coordset, levels=255):
     ----------
         image: 1-4 dimensional ndarray of dtype int
             Input image.
+
         mask:  1-4 dimensional ndarray of dtype int
             Input mask (same size as image, 0,1 array)
             Determines which voxels to use for building
             co-occurence matrix
+
         coordset : 1D ndarray of coordinate offset sets
             array of coordinate offset arrays with the appropriate
             number of dimensions (1-4) for building cooccurence matrices.
+
         levels : int
             The input image should contain integers in [0, levels-1],
             where levels indicate the number of discrete image or
             grey levels counted (256 for an 8-bit image but any number
             of cluster values for general templated images)
+
     Returns
     -------
-        P : 2-dimensional ndarray
+        2D ndarray
            The summed grey-level co-occurrence histogram. The value
            P[i,j] is the number of times that gray-level j
            occurs at offset coords from gray-level i summed over
@@ -191,23 +198,28 @@ def comat(image, mask, coords, levels=255):
 
     Parameters
     ----------
+
         image: 1-4 dimensional ndarray of dtype int
             Input image.
+
         mask:  1-4 dimensional ndarray of dtype int
             Input mask (same size as image, 0,1 array)
             Determines which voxels to use for building
             co-occurence matrix
+
         coords : 1D ndarray
             coordinate offset array with the appropriate number of
             dimensions (1-4) for building cooccurence matrix.
+
         levels : int
             The input image should contain integers in [0, levels-1],
             where levels indicate the number of discrete image or
             grey levels counted (256 for an 8-bit image but any number
             of cluster values for general templated images)
+
     Returns
     -------
-        P : 2-dimensional ndarray
+        2D ndarray
            The grey-level co-occurrence histogram. The value
            P[i,j] is the number of times that gray-level j
            occurs at offset coords from gray-level i.
@@ -287,26 +299,33 @@ def comat_2T_mult(image1, mask1, image2, mask2, coordset, levels1=255, levels2=2
     ----------
         image1: 1-4 dimensional ndarray of dtype int
             Input image 1.
+
         mask1:  1-4 dimensional ndarray of dtype int
             Input mask 1 (same size as image, 0,1 array)
             Determines which voxels to use for building
             co-occurence matrix
+
         image2: 1-4 dimensional ndarray of dtype int
             Input image 2.
+
         mask2:  1-4 dimensional ndarray of dtype int
-            Input mask 2 (same size as image, 0,1 array)            
+            Input mask 2 (same size as image, 0,1 array)
+
         coordset : 1D ndarray of coordinate offset sets
             Array of coordinate offset arrays with the appropriate
             number of dimensions (1-4) for building cooccurence matrices.
+
         levels1 : int
+
         levels2 : int
             The input images should contain integers in [0, levels(1,2)-1],
             where levels indicate the number of discrete image or
             grey levels counted (256 for an 8-bit image but any number
             of cluster values for general templated images)
+
     Returns
     -------
-        P : 2-dimensional ndarray
+        2D ndarray
            The grey-level co-occurrence histogram. The value
            P[i,j] is the number of times that gray-level j
            occurs at offset coords from gray-level i.
@@ -330,26 +349,33 @@ def comat_2T(image1, mask1, image2, mask2, coords, levels1=255, levels2=255):
     ----------
         image1: 1-4 dimensional ndarray of dtype int
             Input image 1.
+
         mask1:  1-4 dimensional ndarray of dtype int
             Input mask 1 (same size as image, 0,1 array)
             Determines which voxels to use for building
             co-occurence matrix
+
         image2: 1-4 dimensional ndarray of dtype int
             Input image 2.
+
         mask2:  1-4 dimensional ndarray of dtype int
-            Input mask 2 (same size as image, 0,1 array)            
+            Input mask 2 (same size as image, 0,1 array)
+
         coords : 1D ndarray
             coordinate offset array with the appropriate number of
             dimensions (1-4) for building cooccurence matrix.
+
         levels1 : int
+
         levels2 : int
             The input images should contain integers in [0, levels(1,2)-1],
             where levels indicate the number of discrete image or
             grey levels counted (256 for an 8-bit image but any number
             of cluster values for general templated images)
+
     Returns
     -------
-        P : 2-dimensional ndarray
+        2D ndarray
            The grey-level co-occurrence histogram. The value
            P[i,j] is the number of times that gray-level j
            occurs at offset coords from gray-level i.
@@ -473,12 +499,15 @@ def cmad(images, masks, distance, angles, levels):
     ----------
         images: 1 or 2 element 1d python array of 1-4 dimensional ndarray(s)
                 of dtype int consisting of an input image(s).
+
         masks:  1 or 2 element 1d python array of 1-4 dimensional ndarray(s)
                 of dtype int consisting of an input mask(s).Determines
                 which voxels to use for building co-occurence matrix
+
         distance: float
             distance in image to use as offset for calculating
             co-occurrence matrix
+
         angles: float
             1 or 2 element 1d python array of angle(s) to use for
             direction to voxel in calculating co-occurrence matrix.
@@ -486,14 +515,16 @@ def cmad(images, masks, distance, angles, levels):
             to the standard angle from the x-axis in polar co-ordinates.
             For 3D images, angles[0] corresponds to the angle theta in
             spherical co-ordinates, i.e. the angle from the z-axis, and
-            angles[1] corresponds to phi, i.e. the angle in the x-y plane. 
+            angles[1] corresponds to phi, i.e. the angle in the x-y plane.
+
         levels : int
             1 or 2 element 1d python array with number of discrete
             levels in the image(s) (256 for an 8-bit image but any number
             of cluster values for general templated images)
+
     Returns
     -------
-        P : 2-dimensional ndarray
+        2D ndarray
            The grey-level co-occurrence histogram. The value
            P[i,j] is the number of times that gray-level j
            occurs at the offset specified by distance and thetas,

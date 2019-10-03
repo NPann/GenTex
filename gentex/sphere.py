@@ -1,6 +1,5 @@
-# gentex.sphere package
-#
 # routines for generating a list of coordinate offsets for various circle or sphere
+
 
 def circle_in(xm, ym, r):
     circ = []

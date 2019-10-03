@@ -1,136 +1,14 @@
-"""
-Simple script for testing and demonstrating GenTex functionality.
-"""
-
-import numpy as np
-from scipy import misc
 import gentex
+import numpy as np
+import imageio
+from PIL import Image
+from scipy import misc
+from pathlib import Path
 
-
-def test_cooccurrence_1d():
-    print("Co-occurrence 1D... ", end="")
-
-    # Generate test data
-    A = np.random.randint(3, size=[100])
-
-    # Generate mask
-    maskA = np.ones([100])
-
-    # Offsets
-    offset1 = [10]
-
-    # Building co-occurrence matrix
-    gentex.comat.comat(A, maskA, offset1, levels=3)
-
-    # Building co-occurrence matrix from 2 images
-    gentex.comat.comat_2T(A, maskA, A, maskA, offset1, levels1=3, levels2=3)
-
-    print("DONE")
-
-
-def test_cooccurrence_2d():
-    print("Co-occurrence 2D... ", end="")
-
-    # Generate test data
-    B = np.random.randint(3, size=[10, 10])
-
-    # Generate mask
-    maskB = np.ones([10, 10])
-
-    # Offsets
-    offset2 = [0, 1]
-
-    gentex.comat.comat(B, maskB, offset2, levels=3)
-
-    gentex.comat.cmad([B], [maskB], 2.0, [np.pi / 4], [3])
-
-    gentex.comat.comat_2T(B, maskB, B, maskB, offset2, levels1=3, levels2=3)
-
-    gentex.comat.cmad([B, B], [maskB, maskB], 2.0, [np.pi / 4], [3, 3])
-
-    print("DONE")
-
-
-def test_cooccurrence_3d():
-    print("Co-occurrence 3D... ", end="")
-
-    C = np.random.randint(3, size=[5, 5, 5])
-
-    maskC = np.ones([5, 5, 5])
-
-    offset3 = [1, 1, 1]
-
-    gentex.comat.comat(C, maskC, offset3, levels=3)
-
-    gentex.comat.cmad([C], [maskC], 2.0, [np.pi / 4, np.pi / 4], [3])
-
-    gentex.comat.comat_2T(C, maskC, C, maskC, offset3, levels1=3, levels2=3)
-
-    gentex.comat.cmad([C, C], [maskC, maskC], 2.0, [np.pi / 4, np.pi / 4], [3, 3])
-
-    print("DONE")
-
-
-def test_cooccurrence_4d():
-    print("Co-occurrence 4D... ", end="")
-
-    D = np.random.randint(3, size=[3, 3, 3, 3])
-
-    maskD = np.ones([3, 3, 3, 3])
-
-    offset4 = [0, 0, 0, 1]
-
-    gentex.comat.comat(D, maskD, offset4, levels=3)
-
-    gentex.comat.comat_2T(D, maskD, D, maskD, offset4, levels1=3, levels2=3)
-
-    print("DONE")
-
-
-def test_cooccurrence_mult():
-    print("Co-occurrence with multiple offsets... ", end="")
-
-    # Generate test data
-    B = np.random.randint(3, size=[10, 10])
-
-    # Generate mask
-    maskB = np.ones([10, 10])
-
-    # Offsets
-    offset2 = [[0, 1], [1, 1]]
-
-    gentex.comat.comat_mult(B, maskB, offset2, levels=3)
-
-    gentex.comat.comat_2T_mult(B, maskB, B, maskB, offset2, levels1=3, levels2=3)
-
-    print("DONE")
-
-
-def test_cluster_features():
-
-    print("Clustering... ", end='')
-
-    # Load test data
-    im = misc.imread('test_image.png')
-    B = [im]
-
-    # Generate mask
-    maskB = np.ones(B[0].shape)
-
-    # Offsets
-    offset2 = [[0, 1], [1, 1]]
-
-    # Construct features space
-    fe = gentex.features.Features(B, maskB, offset2)
-
-    # Cluster space
-    fe.clusfs(numclus=4)
-
-    print("DONE")
+FIXTURE_DIR = Path(__file__).parents[0]/'fixtures'
 
 
 def test_texture_measure():
-    print("Texture measure... ", end='')
 
     # Complexity/Texture measures to compute
     texm = ['CM Entropy',
@@ -150,7 +28,7 @@ def test_texture_measure():
             'Multifractal Spectrum Entropy Range']
 
     # Load image
-    im = misc.imread('test_image.png')
+    im = imageio.imread(FIXTURE_DIR/'test_image.png')
 
     # Make mask - use threshold re. adding gm + wm + csf
     mask = np.where(im > 0, 1, 0)
@@ -181,23 +59,20 @@ def test_texture_measure():
     # Run length for "Probability of Run Length", "Epsilon Machine Run Length" and "Run Length Asymetry"
     mytex.rllen = 0.1
 
-    print("DONE")
     for meas in texm:
         mytex.calc_measure(meas)
         print('\t', meas, '= ', mytex.val)
 
 
 def test_texture_measure_voxel_wise():
-    print("Texture measure voxel wise... ", end='')
-
     # Complexity/Texture measures to compute
     texm = ['CM Entropy']
 
     # Load image
-    im = misc.imread('test_image.png')
+    im = Image.open(FIXTURE_DIR/'test_image.png')
 
     # Downsampling for testing
-    im = misc.imresize(im, 1/4)
+    im = np.asarray(im.resize(tuple(map(lambda x: x//4, im.size))))
 
     # Make mask - use threshold re. adding gm + wm + csf
     mask2 = np.where(im > 0, 1, 0)
@@ -230,27 +105,3 @@ def test_texture_measure_voxel_wise():
 
         # restore mask
         mask1[a, b] = 0
-
-    print("DONE")
-
-
-if __name__ == '__main__':
-    print("TEST...")
-
-    test_cooccurrence_1d()
-
-    test_cooccurrence_2d()
-
-    test_cooccurrence_3d()
-
-    test_cooccurrence_4d()
-
-    test_cooccurrence_mult()
-
-    test_cluster_features()
-
-    test_texture_measure()
-
-    test_texture_measure_voxel_wise()
-
-    print("PASS")
