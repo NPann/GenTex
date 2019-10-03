@@ -12,10 +12,10 @@ COPY [".", "/src/gentex"]
 RUN apt-get update -qq \
     && pip install -r /opt/requirements.txt \
     && cd /src/gentex \
-    && pip install -e . \
+    && python setup.py build_ext -i \
+    && python setup.py install \
     && chown -R gentex /src/gentex
 
 USER gentex
 
 WORKDIR /src/gentex
-

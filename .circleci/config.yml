@@ -63,7 +63,7 @@ aliases:
       - /tmp/cache/docker.tar.gz
 
   - &create-volume-for-remote-mount
-    name: Create volume for mounting to remote docker
+    name: Create volume for mounting to remote docker to deal with permission issue
     command: |
       # create a dummy container which will hold a volume with config
       docker run -it -d --mount 'type=volume,src=source,dst=/src/gentex' --name source-vol alpine /bin/sh
