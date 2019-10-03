@@ -1,21 +1,35 @@
-# README #
+[![Documentation Status](https://readthedocs.org/projects/gentex/badge/?version=latest)](https://gentex.readthedocs.io/en/latest/?badge=latest)
+[![CircleCI](https://circleci.com/gh/NPann/GenTex.svg?style=svg)](https://circleci.com/gh/NPann/GenTex)
 
-The GenTex or general texture analysis package provides a suite of routines that combines standard texture analysis methods and entropy/statistical complexity analysis methods.
+GenTex stands for General Texture analysis.  
 
+This package provides a suite of routines that combines standard texture analysis methods 
+based on [GLCM](https://en.wikipedia.org/wiki/Co-occurrence_matrix) 
+and entropy/statistical complexity analysis methods.
 
-### What is this repository for? ###
+## What is this package for?
 
-GenTex provides a number of the standard algorithms required for generating complexity/texture measure estimates from multimodal imaging data. These include:
+GenTex provides a number of the standard algorithms required for generating 
+complexity/texture measure estimates from multimodal imaging data. These include:
 
-1. Generation of multidimensional feature spaces from multimodal 'image' data (i.e. multiple 'co-registered' 1,2,3, or 4 dimensional data sets, e.g. multiple 'co-registered' time series, multimodal image data, space/time data..) via the use of a set of image templates, including:
+1. Generation of multidimensional feature spaces from multimodal 'image' data 
+(i.e. multiple 'co-registered' 1,2,3, or 4 dimensional data sets, e.g. 
+multiple 'co-registered' time series, multimodal image data, space/time data..) 
+via the use of a set of image templates, including:  
+
     - single voxels
     - linear sequences in cardinal directions (ref.)
     - notches in cardinal directions (ref.)
     - light cones in cardinal directions and 45 degree angles (ref.)
 
-2. Clustering methods for generating discrete ('grey') levels from the constructed feature space (the levels are then typically mapped to the original image space at the anchor points of the templates)
+2. Clustering methods for generating discrete ('grey') levels from the constructed 
+feature space (the levels are then typically mapped to the original image space at 
+the anchor points of the templates)
 
-3. Building co-occurrence matrices from a discrete level 'image' or a pair of discrete level 'images', where the discrete level 'images' are typically generated via feature space clustering of the original multimodal data sets (time series, images, space/time data...)
+3. Building co-occurrence matrices from a discrete level 'image' or a pair of 
+discrete level 'images', where the discrete level 'images' are typically generated 
+via feature space clustering of the original multimodal data sets (time series, images, 
+space/time data...)
 
 4. Estimation of various complexity/texture measures from the co-occurrence matrices.
 (Haralick measures and epsilon machine related quantities) such as:
@@ -36,7 +50,35 @@ GenTex provides a number of the standard algorithms required for generating comp
     - Multifractal Spectrum Energy Range
     - Multifractal Spectrum Entropy Range
 
-References:
+### Documentation
+
+TODO: sphinx integration 
+
+### How do I get set up? ###
+
+``` bash
+python setup.py build_ext -i
+python setup.py install
+```
+
+Then `import gentex` and check the documentation
+
+TODO: make it pip installable
+
+### Who do I talk to?
+
+- Karl Young (original developer)
+- Nicolas Pannetier 
+- Norbert Schuff
+
+
+### License
+
+GenTex is licensed under the terms of the BSD license.
+Please see the License file in the GenTex distribution
+
+
+### References
 
 * K. Young, Y. Chen, J. Kornak, G. B. Matson, N. Schuff,
 'Summarizing complexity in high dimensions',
@@ -58,38 +100,3 @@ of Complexity, VIII, Addison-Wesley, Reading, Massachusetts
 * C. R. Shalizi and J. P. Crutchfield, 'Computational
 Mechanics: Pattern and Prediction, Structure and Simplicity',
 Journal of Statistical Physics 104 (2001) 819--881.
-
-
-### How do I get set up? ###
-
-* Compile the C-library from the gentex subdirectory.
-
-``` bash
-python setup.py build_ext -i
-``` 
-
-* Run test.py to check if GenTex is running.
-
-``` bash
-python ./test.py
-``` 
-
-* Have a pick at test_texture_measure() function in test.py to get started and write your own scripts.
-
-
-### Requirements ###
-
-* Python 3.x or superior
-* Numpy 
-* Scipy
-
-
-### Who do I talk to? ###
-
-This module was developed by Karl Young and, to minor extend, by Nicolas Pannetier and Norbert Schuff.
-
-
-### License ###
-
-GenTex is licensed under the terms of the BSD license.
-Please see the License file in the GenTex distribution

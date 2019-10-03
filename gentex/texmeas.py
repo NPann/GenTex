@@ -6,197 +6,107 @@ import numpy as np
 
 
 class Texmeas:
-    """
-    Class texmeas for generating texture measures from co-occurence
-    matrix
-    
-    Class Methods
-    --------------
+    """Class texmeas for generating texture measures from co-occurrence matrix
 
-    __init__(comat) - initializes the class; requires a cooccurence
-                      matrix for construction and can be passed
-                      any of the optional arguments listed below
-                      re. 'available to constructor'
+    Parameters
+    ----------
 
-    calc_measure(measure) - passed one of the strings listed below
-                            available for the class variable measure,
-                            calculates the appropriate measure and
-                            puts the value in the class variable val.
-                            For info. on epsilon machine related
-                            complexity/entropy measures see reference
-                            list provided below in description of the
-                            est_em() function. For a disucssion of
-                            Haralick cooccurence style texture measures
-                            see:
-                            R. M. Haralick, 'Statistical and structural
-                            approaches to texture'. Proceedings of the IEEE
-                            May 1979, 67(5). 786-804 
-                            
+    comat: ndarray
+        Non-normalized co-occurrence matrix - chi-squared conditional distribution
+        comparisons require the actual number of counts so don't normalize this before
+        sending in
 
+    measure: string
+        Texture measure (default = 'Statistical Complexity'). Choice of:
 
-    est_em() - estimate an epsilon machine from a
-               cooccurence matrix with #rows = #cols, done
-               implicitly whenever one of the related
-               complexity/entropy measures (EM Entropy,
-               Statistical Complexity,Epsilon Machine Run Length )
-               are calculated - for info. an epsilon machines and
-               the related measures see:
+            * 'CM Entropy'
+            * 'EM Entropy'
+            * 'Statistical Complexity'
+            * 'Energy Uniformity'
+            * 'Maximum Probability'
+            * 'Contrast'
+            * 'Inverse Difference Moment'
+            * 'Correlation'
+            * 'Probability of Run Length'
+            * 'Epsilon Machine Run Length'
+            * 'Run Length Asymmetry'
+            * 'Homogeneity'
+            * 'Cluster Tendency'
+            * 'Multifractal Spectrum Energy Range'
+            * 'Multifractal Spectrum Entropy Range'
 
-               K. Young, Y. Chen, J. Kornak, G. B. Matson, N. Schuff,
-               'Summarizing complexity in high dimensions',
-               Phys Rev Lett. (2005) Mar 11;94(9):098701.
+    coordmo: int
+        Moment of coordinate differences in co-occurrence matrix
+        needed for calculating 'Contrast' and 'Inverse Difference Moment'  (default=0)
 
-               C. R. Shalizi and J. P. Crutchfield, 'Computational
-               Mechanics: Pattern and Prediction, Structure and Simplicity',
-               Journal of Statistical Physics 104 (2001) 819--881.
+    probmom: int
+        Moment of individual cooccurence probabilities
+        needed for calculating 'Contrast' and 'Inverse Difference Moment'  (default=0)
 
-               K. Young and J. P. Crutchfield, 'Fluctuation Spectroscopy',
-               Chaos, Solitons, and Fractals 4 (1993) 5-39.
+    rllen: int
+        Length of run length used for generating probability
+        of a run length (the higher this probability the
+        larger the constant patches on the scale used for generating
+        the co-occurence matrix) or the epsilon machine run length  (default=0)
 
-               J. P. Crutchfield and K. Young, 'Computation at the
-               Onset of Chaos', in Entropy, Complexity, and Physics of
-               Information, W. Zurek, editor, SFI Studies in the Sciences
-               of Complexity, VIII, Addison-Wesley, Reading, Massachusetts
-               (1990) 223-269. 
+    clusmom: int
+        Moment used for generating cooccurence cluster tendency (default=0)
                
-               C. R. Shalizi and J. P. Crutchfield, 'Computational
-               Mechanics: Pattern and Prediction, Structure and Simplicity',
-               Journal of Statistical Physics 104 (2001) 819--881. 
-    
+    samelev: bool
+        Whether to treat the rows and columns in the cooccurence
+        matrix as identical 'states' (the methods are very general
+        so this needn't be the case, e.g. different template shapes
+        from different images with different quantization levels
+        could be used to generate the cooccurence matrix which could
+        be of arbitrary shape)
 
-    Class Variables
-    ----------------
+        default = True assumes the cooccurrence matrix is square
+        and the rows and columns correspond to the same 'state'
 
-    Class variables required by constructor:
+    betas: array
+        An array of 3 values, the lower limit, the upper limit and
+        the number of steps to use as the 'inverse temperature' range
+        for estimating the multifractal spectrum from an epsilon machine
+        - getting the range right for an 'arbitrary' epsilon machine is
+        tricky and is expected to be reset over a number of trials before
+        getting a full spectrum estimate. For details on the rationale
+        and algorithm see:
 
-    comat -    non-normalized cooccurence matrix - 
-               chi-squared conditinal distribution
-               comparisons require the actual number
-               of counts so don't normalize this before
-               sending in
+        K. Young and J. P. Crutchfield, 'Fluctuation Spectroscopy',
+        Chaos, Solitons, and Fractals 4 (1993) 5-39.
 
-    Class variables available to constructor:
 
-    measure -  string
-               texture meaure; choice of:
-               'CM Entropy'
-               'EM Entropy'
-               'Statistical Complexity'
-               'Energy Uniformity'
-               'Maximum Probability'
-               'Contrast'
-               'Inverse Difference Moment'
-               'Correlation'
-               'Probability of Run Length'
-               'Epsilon Machine Run Length'
-               'Run Length Asymmetry'
-               'Homogeneity'
-               'Cluster Tendency'
-               'Multifractal Spectrum Energy Range'
-               'Multifractal Spectrum Entropy Range'
-               
-               default = 'Statistical Complexity'
+    Attributes
+    ----------
 
-    coordmom - int
-               moment of coordinate differences in cooccurence matrix
-               needed for calculating 'Contrast' and
-               'Inverse Difference Moment'
-               default = 0
+    emclus: int
+        Number of clusters ('states') found when estimating an epsilon machine from the co-occurrence matrix.
 
-    probmom -  int
-               moment of individual cooccurence probabilities
-               needed for calculating 'Contrast' and
-               'Inverse Difference Moment'
-               
-               default = 0
+    emest: bool
+        Whether or not an epsilon machine has been estimated yet
 
-    rllen -    int
-               length of run length used for generating probability
-               of a run length (the higher this probability the
-               larger the constant patches on the scale used for generating
-               the co-occurence matrix) or the epsilon machine run length
-               
-               default = 0
+    emmat: float
+        The estimated epsilon machine as a standard Markov process transition matrix.
 
-    clusmom -  int
-               moment used for generating cooccurence cluster tendency
-               
-               default = 0
-               
-    samelev - boolean
-              whether to treat the rows and columns in the cooccurence
-              matrix as identical 'states' (the methods are very general
-              so this needn't be the case, e.g. different template shapes
-              from different images with different quantization levels
-              could be used to generate the cooccurence matrix which could
-              be of arbitrary shape)
-              
-              default - True (assumes the cooccurrence matrix is square
-                              and the rows and columns correspond to the same
-                              'state')
-    betas -   array
-              an array of 3 values, the lower limit, the upper limit and
-              the number of steps to use as the 'inverse temperature' range
-              for estimating the multifractal spectrum from an epsilon machine
-              - getting the range right for an 'arbitrary' epsilon machine is
-              tricky and is expected to be reset over a number of trials before
-              getting a full spectrum estimate. For details on the rationale
-              and algorithm see:
-              
-              K. Young and J. P. Crutchfield, 'Fluctuation Spectroscopy',
-              Chaos, Solitons, and Fractals 4 (1993) 5-39.
+    condo: 2d-array
+        Co-occurrence matrix renormalized as a rowise matrix of conditional probabilites - built as part of
+        epsilon machine estimation
 
-    Internal class variables:
+    emclasses: list
+        List of which of the values in emclus each row in condo (and hence the cooccurence matrix) belongs to
 
-    emclus - number of clusters ('states') found when estimating an epsilon
-             machine from the cooccurence matrix.
+    clusp: float
+        Chisquared p value to use for clustering epsilon machine rows
 
-    emest - whether or not an epsilon machine has been estimated yet
+    val: float
+        Value of most recently calculated texture measure
 
-    emmat - the estimated epsilon machine as a standard Markov process
-            transition matrix.
+    mfsspec: array
+        Array containing the multifractal spectral estimates obtained
+        over the range of 'inverse temperatures' provided in betas
 
-    condo - cooccurence matrix renormailzed as a rowise matrix of conditional
-            probabilites - built as part of epsilon machine estimation
-
-    emclasses - list of which of the values in emclus each row in condo
-                (and hence the cooccurence matrix) belongs to
-
-    clusp - chisquared p value to use for clustering epsilon machine rows
-
-    val -      float
-               value of most recently calculated texture measure
-
-    mfsspec - array
-              array containing the multifractal spectral estimates obtained
-              over the range of 'inverse temperatures' provided in betas
-
-    currval - string
-              one of the above listed values for measure specifying
-              which of the meaures constitutes the current value in val
-              (the most recently calculated value) and is equal to one of
-              the values in the variables listed below (and which correspond
-              to the appropriate measures)
-
-    The following variables (Haralick measures and epsilon machine related
-    quantities) are initialized to NaN so if that's what you get when
-    asking for that variable that measure has not been estimated yet.
-
-    cme -       CM Entropy
-    eme -       EM Entropy
-    stc -       Statistical Complexity
-    enu -       Energy Uniformity
-    map -       Maximum Probability
-    con -       Contrast
-    idm -       Inverse Difference Moment
-    cor -       Correlation
-    prl -       Probability of Run Length
-    erl -       Epsilon Machine Run Length
-    rla -       Run Length Asymmetry
-    hom -       Homogeneity
-    clt -       Cluster Tendency
-    mfu -       Multifractal Spectrum Energy Range
-    mfs -       Multifractal Spectrum Entropy Range
+    currval: string
+        One of the listed measures method which constitutes the current value in val
             
     """
 
@@ -273,29 +183,35 @@ class Texmeas:
         self.calc_measure(self.measure)
 
     def calc_measure(self, measure='Statistical Complexity', coordmom=0, probmom=0, rllen=0, clusmom=0, samelev=True):
-        """
-        Passed one of the strings:
-        
-        'CM Entropy'
-        'EM Entropy'
-        'Statistical Complexity'
-        'Energy Uniformity'
-        'Maximum Probability'
-        'Contrast'
-        'Inverse Difference Moment'
-        'Correlation'
-        'Probability of Run Length'
-        'Epsilon Machine Run Length'
-        'Run Length Asymmetry'
-        'Homogeneity'
-        'Cluster Tendency'
-        'Multifractal Spectrum Energy Range'
-        'Multifractal Spectrum Entropy Range'
-        
-        calculates the appropriate texture measure and
-        puts the value in the class variable val and
-        updates the class variable currval with the passed
-        string
+        """Calculates the appropriate texture measure and puts the value in the class variable val and
+        updates the class variable currval with the passed string
+
+        For a discussion of Haralick co-occurrence style texture measures see:
+        R. M. Haralick, 'Statistical and structural approaches to texture'. Proceedings of the IEEE May 1979, 67(5).
+        786-804.
+
+        Parameters
+        ----------
+
+        measure: string
+            One of the following measure methods (default = 'Statistical Complexity'):
+
+                 - 'CM Entropy'
+                 - 'EM Entropy'
+                 - 'Statistical Complexity'
+                 - 'Energy Uniformity'
+                 - 'Maximum Probability'
+                 - 'Contrast'
+                 - 'Inverse Difference Moment'
+                 - 'Correlation'
+                 - 'Probability of Run Length'
+                 - 'Epsilon Machine Run Length'
+                 - 'Run Length Asymmetry'
+                 - 'Homogeneity'
+                 - 'Cluster Tendency'
+                 - 'Multifractal Spectrum Energy Range'
+                 - 'Multifractal Spectrum Entropy Range'
+
         """
 
         self.measure = measure
@@ -454,7 +370,7 @@ class Texmeas:
                     for i in range(self.comat.shape[0]):
                         if colprobs[i] != 0.0:
                             self.prl += ((colprobs[i] - self.comat[i, i]) ** 2 * (
-                                self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
+                                    self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
             self.val = self.prl
             self.currval = "Probability of Run Length"
 
@@ -471,7 +387,7 @@ class Texmeas:
                         colprobs[i] = np.sum(self.emmat[i, :])
                     for i in range(self.emmat.shape[0]):
                         self.erl += ((colprobs[i] - self.emmat[i, i]) ** 2 * (self.emmat[i, i] ** (self.rllen - 1))) / (
-                            colprobs[i] ** self.rllen)
+                                colprobs[i] ** self.rllen)
             self.val = self.erl
             self.currval = "Epsilon Machine Run Length"
 
@@ -490,10 +406,10 @@ class Texmeas:
                     for i in range(self.comat.shape[0]):
                         if colprobs[i] != 0.0:
                             colval += ((colprobs[i] - self.comat[i, i]) ** 2 * (
-                                self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
+                                    self.comat[i, i] ** (self.rllen - 1))) / (colprobs[i] ** self.rllen)
                         if rowprobs[i] != 0.0:
                             rowval += ((rowprobs[i] - self.comat[i, i]) ** 2 * (
-                                self.comat[i, i] ** (self.rllen - 1))) / (rowprobs[i] ** self.rllen)
+                                    self.comat[i, i] ** (self.rllen - 1))) / (rowprobs[i] ** self.rllen)
                     self.rla = np.abs(colval - rowval)
             self.val = self.rla
             self.currval = "Run Length Asymmetry"
@@ -553,6 +469,7 @@ class Texmeas:
             "Sorry don't know about texture measure ", self.measure
 
     def est_multi_frac_spec(self):
+        """TODO"""
         import scipy.linalg as L
 
         self.mfsspec = []
@@ -618,12 +535,26 @@ class Texmeas:
         self.mfsest = True
 
     def est_em(self):
-        """
-        Estimates an epsilon machine
+        """Estimate an epsilon machine from a co-occurrence matrix with #rows = #cols, done implicitly whenever one
+        of the related complexity/entropy measures (EM Entropy, Statistical Complexity, Epsilon Machine Run Length)
+        are calculated.
 
-        No arguments, expects cooccurence matrix, with # rows =
-        # columns to be in self.comat
-        
+        For info on epsilon machines and the related measures see:
+
+            - K. Young, Y. Chen, J. Kornak, G. B. Matson, N. Schuff, 'Summarizing complexity in high dimensions', \
+            Phys Rev Lett. (2005) Mar 11;94(9):098701.
+
+            - C. R. Shalizi and J. P. Crutchfield, 'Computational Mechanics: Pattern and Prediction, Structure and \
+            Simplicity', Journal of Statistical Physics 104 (2001) 819--881.
+
+            - K. Young and J. P. Crutchfield, 'Fluctuation Spectroscopy', Chaos, Solitons, and Fractals 4 (1993) 5-39.
+
+            - J. P. Crutchfield and K. Young, 'Computation at the Onset of Chaos', in Entropy, Complexity, and Physics \
+            of Information, W. Zurek, editor, SFI Studies in the Sciences of Complexity, VIII, Addison-Wesley, Reading,\
+            Massachusetts (1990) 223-269.
+
+            - C. R. Shalizi and J. P. Crutchfield, 'Computational Mechanics: Pattern and Prediction, Structure and \
+            Simplicity', Journal of Statistical Physics 104 (2001) 819--881.
         """
         import scipy.stats as ss
 
@@ -723,4 +654,3 @@ class Texmeas:
             # and finally turned into a Markov matrix...
         self.emmat = np.transpose(np.transpose(self.emmat) / np.sum(self.emmat, axis=1))
         self.emest = True
-        

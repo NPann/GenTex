@@ -1,0 +1,160 @@
+#version: 2  # use CircleCI 2.0
+
+version: 2.1
+
+orbs:
+  aws-ecr: circleci/aws-ecr@6.1.0
+
+# Storing a few handy aliases
+aliases:
+  - &setup-docker-image-name
+    name: Setup docker image name
+    command: |
+      VER='0.1.0'
+      echo 'export DOCKER_IMAGE_NAME=gentex/main:'${VER} >> $BASH_ENV
+      echo 'export DOCKER_CACHE_NAME=gentex:'${VER} >> $BASH_ENV
+
+  - &load-docker-image-layer-cache
+    name: Load Docker image layer cache
+    no_output_timeout: 30m
+    command: |
+      docker info
+      set +o pipefail
+      if [ -f /tmp/cache/docker.tar.gz ]; then
+        sudo apt update && sudo apt -y install pigz
+        pigz -d --stdout /tmp/cache/docker.tar.gz | docker load;
+      fi
+      docker images
+
+  - &build-docker-image
+    name: Build docker image
+    no_output_timeout: 30m
+    command: |
+      docker build -t ${DOCKER_IMAGE_NAME} -f docker/Dockerfile \
+      --build-arg BUILD_DATE=`date -u +"%Y-%m-%dT%H:%M:%SZ"` \
+      --build-arg VCS_REF=`git rev-parse --short HEAD` \
+      --build-arg VERSION="${CIRCLE_TAG}" \
+      --cache-from=${DOCKER_IMAGE_NAME} .
+
+  - &load-docker-image
+    name: Load docker image
+    no_output_timeout: 30m
+    command: |
+      docker info
+      set +o pipefail
+      if [ -f /tmp/cache/docker.tar.gz ]; then
+        sudo apt update && sudo apt -y install pigz
+        pigz -d --stdout /tmp/cache/docker.tar.gz | docker load
+        docker images
+      fi
+
+  - &restore-cache
+    keys:
+      - docker-v1-{{ .Branch }}-{{ epoch }}
+      - docker-v1-{{ .Branch }}-
+      - docker-v1-master-
+      - docker-v1-
+    paths:
+      - /tmp/cache/docker.tar.gz
+
+  - &save-cache
+    key: docker-v1-{{ .Branch }}-{{ epoch }}
+    paths:
+      - /tmp/cache/docker.tar.gz
+
+  - &create-volume-for-remote-mount
+    name: Create volume for mounting to remote docker to deal with permission issue
+    command: |
+      # create a dummy container which will hold a volume with useful file
+      # This is required because circleci runs with uid=3434 whereas are docker image is on uid=1000
+      # And that's an issue for bringing back the files generated from withing the docker container (e.g. test, doc)
+      # to circleci instance for storing as artifacts
+      docker run -it -d --mount 'type=volume,src=source,dst=/src/gentex/artifacts' --name artifacts-vol alpine /bin/sh
+      # change ownership to gentex (ID:1000) user
+      docker exec -it artifacts-vol chown -R 1000:100 /src/gentex/artifacts
+      docker exec -it artifacts-vol ls -l /src/gentex/artifacts
+
+
+jobs:
+
+  build:
+    environment:
+      LANG: en_US.UTF-8
+    docker:
+      - image: circleci/python:3.7.3
+    steps:
+      - checkout
+      - run: *setup-docker-image-name
+      - setup_remote_docker
+      - restore_cache: *restore-cache
+      - run: *load-docker-image-layer-cache
+      - run: *build-docker-image
+      - run:
+          name: Save Docker image layer cache
+          command: |
+            mkdir -p /tmp/cache
+            sudo apt update && sudo apt -y install pigz
+            docker save ${DOCKER_IMAGE_NAME} | pigz -2 -p 3 > /tmp/cache/docker.tar.gz
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - cache/docker.tar.gz
+      - save_cache: *save-cache
+
+  test:
+    environment:
+      LANG: en_US.UTF-8
+    docker:
+      - image: circleci/python:3.7.3
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - checkout
+      - run: *setup-docker-image-name
+      - setup_remote_docker
+      - run: *load-docker-image
+      - run: *create-volume-for-remote-mount
+      - run:
+          name: Test
+          command: |
+            docker run -it --volumes-from artifacts-vol --name test ${DOCKER_IMAGE_NAME} pytest --junitxml=artifacts/junit.xml
+            docker cp test:/src/gentex/artifacts .
+      - store_test_results:
+          path: artifacts
+      - store_artifacts:
+          path: artifacts
+
+  build_doc:
+    environment:
+      LANG: en_US.UTF-8
+    docker:
+      - image: circleci/python:3.7.3
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - checkout
+      - run: *setup-docker-image-name
+      - setup_remote_docker
+      - run: *load-docker-image
+      - run: *create-volume-for-remote-mount
+      - run:
+          name: Build doc
+          command: |
+            docker run -it --volumes-from artifacts-vol --name doc ${DOCKER_IMAGE_NAME} bash -c "cd doc/ && make html && \
+            cp -r _build /src/gentex/artifacts"
+            docker cp doc:/src/gentex/artifacts .
+      - store_artifacts:
+          path: artifacts/_build/html
+          prefix: doc
+
+
+workflows:
+  build-test-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - build_doc:
+          requires:
+            - build
