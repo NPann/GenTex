@@ -1,3 +1,6 @@
+[![Documentation Status](https://readthedocs.org/projects/gentex/badge/?version=latest)](https://gentex.readthedocs.io/en/latest/?badge=latest)
+[![CircleCI](https://circleci.com/gh/NPann/GenTex.svg?style=svg)](https://circleci.com/gh/NPann/GenTex)
+
 GenTex stands for General Texture analysis.  
 
 This package provides a suite of routines that combines standard texture analysis methods 
