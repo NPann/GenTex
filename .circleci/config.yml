@@ -186,12 +186,21 @@ workflows:
   build-test-deploy:
     jobs:
       - build
+          filters:
+            tags:
+              only: /.*/
       - test:
           requires:
             - build
+          filters:
+            tags:
+              only: /.*/
       - build_doc:
           requires:
             - build
+          filters:
+            tags:
+              only: /.*/
       - deploy_pypi:
           requires:
             - test
