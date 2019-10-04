@@ -5,4 +5,4 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.StreamHandler())
 logger.setLevel(logging.INFO)
 
-__version__ = '0.1.0'
+__version__ = '0.1.1'
