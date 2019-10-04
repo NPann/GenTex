@@ -147,6 +147,38 @@ jobs:
           path: artifacts/_build/html
           prefix: doc
 
+  deploy_pypi:
+    environment:
+      LANG: en_US.UTF-8
+    docker:
+      image: circleci/python:3.7.3
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - checkout
+      - run: *setup-docker-image-name
+      - setup_remote_docker
+      - run: *load-docker-image
+      - run: *create-volume-for-remote-mount
+      - run:
+          name: verify git tag vs. version
+          command: |
+            python setup.py verify
+      - run:
+          name: init .pypirc
+          command: |
+            echo -e "[pypi]" >> ~/.pypirc
+            echo -e "username = $PYPI_USERNAME" >> ~/.pypirc
+            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+      - run:
+          name: Deploy to PyPi
+          command: |
+            docker run -it --volumes-from artifacts-vol --name doc -e CIRCLE_TAG ${DOCKER_IMAGE_NAME} bash -c \
+            "python setup.py sdist && cp -r dist /src/gentex/artifacts"
+            docker cp doc:/src/gentex/artifacts .
+            python -m twine check artifacts/dist/*
+            python -m twine upload artifacts/dist/*
+
 
 workflows:
   build-test-deploy:
@@ -158,3 +190,12 @@ workflows:
       - build_doc:
           requires:
             - build
+      - deploy_pypi:
+          requires:
+            - test
+            - build_doc
+          filters:
+            tags:
+              only: /[0-9]+(\.[0-9]+)*/
+            branches:
+              ignore: /.*/

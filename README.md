@@ -52,18 +52,13 @@ space/time data...)
 
 ### Documentation
 
-TODO: sphinx integration 
+The documentation on GenTex in hosted [here](https://gentex.readthedocs.io/en/latest/topics/quickstart.html)
 
-### How do I get set up? ###
+### Installation ###
 
 ``` bash
-python setup.py build_ext -i
-python setup.py install
+pip install gentex
 ```
-
-Then `import gentex` and check the documentation
-
-TODO: make it pip installable
 
 ### Who do I talk to?
 
