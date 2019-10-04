@@ -4,7 +4,7 @@ Introduction
 GenTex stands for General Texture analysis.
 
 This package provides a suite of routines that combines standard texture analysis methods
-based on GLC and entropy/statistical complexity analysis methods.
+based on GLCM and entropy/statistical complexity analysis methods.
 
 What is this package for?
 ==========================

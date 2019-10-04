@@ -2,7 +2,6 @@ import gentex
 import numpy as np
 import imageio
 from PIL import Image
-from scipy import misc
 from pathlib import Path
 
 FIXTURE_DIR = Path(__file__).parents[0]/'fixtures'
