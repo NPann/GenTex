@@ -10,9 +10,8 @@ aliases:
   - &setup-docker-image-name
     name: Setup docker image name
     command: |
-      VER='0.1.0'
-      echo 'export DOCKER_IMAGE_NAME=gentex/main:'${VER} >> $BASH_ENV
-      echo 'export DOCKER_CACHE_NAME=gentex:'${VER} >> $BASH_ENV
+      echo 'export DOCKER_IMAGE_NAME=gentex/main:latest >> $BASH_ENV
+      echo 'export DOCKER_CACHE_NAME=gentex:latest >> $BASH_ENV
 
   - &load-docker-image-layer-cache
     name: Load Docker image layer cache
