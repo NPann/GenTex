@@ -1,11 +1,11 @@
 [![Documentation Status](https://readthedocs.org/projects/gentex/badge/?version=latest)](https://gentex.readthedocs.io/en/latest/?badge=latest)
 [![CircleCI](https://circleci.com/gh/NPann/GenTex.svg?style=svg)](https://circleci.com/gh/NPann/GenTex)
 
-GenTex stands for General Texture analysis.  
+**GenTex** stands for **Gen**eral **Tex**ture Analysis.  
 
-This package provides a suite of routines that combines standard texture analysis methods 
-based on [GLCM](https://en.wikipedia.org/wiki/Co-occurrence_matrix) 
-and entropy/statistical complexity analysis methods.
+This package provides a suite of routines that combines standard texture 
+analysis methods based on [GLCM](https://en.wikipedia.org/wiki/Co-occurrence_matrix) 
+and entropy/statistical complexity measures.
 
 ## What is this package for?
 
@@ -18,9 +18,9 @@ multiple 'co-registered' time series, multimodal image data, space/time data..)
 via the use of a set of image templates, including:  
 
     - single voxels
-    - linear sequences in cardinal directions (ref.)
-    - notches in cardinal directions (ref.)
-    - light cones in cardinal directions and 45 degree angles (ref.)
+    - linear sequences in cardinal directions
+    - notches in cardinal directions
+    - light cones in cardinal directions and 45 degree angles
 
 2. Clustering methods for generating discrete ('grey') levels from the constructed 
 feature space (the levels are then typically mapped to the original image space at 
@@ -59,6 +59,8 @@ The documentation on GenTex in hosted [here](https://gentex.readthedocs.io/en/la
 ``` bash
 pip install gentex
 ```
+
+Note: It may require that a C compiler (e.g. `gcc`) is installed on your system
 
 ### Who do I talk to?
 

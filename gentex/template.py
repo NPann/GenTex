@@ -32,7 +32,7 @@ class Template:
     dimension: int
         Dimension of template
 
-    inculsion: bool
+    inclusion: bool
         Whether or not to include anchor point (i.e. [0], [0,0],...)
 
     handedness: 1D int array
