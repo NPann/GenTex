@@ -50,7 +50,6 @@ extensions = [
     'sphinx.ext.autodoc',
     'numpydoc',
     'sphinx.ext.napoleon',
-    'recommonmark',
 ]
 
 # Napoleon settings
