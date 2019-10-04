@@ -161,6 +161,9 @@ jobs:
       - run: *load-docker-image
       - run: *create-volume-for-remote-mount
       - run:
+          name: Install build depends
+          command: sudo pip install "setuptools>=30.3.0" "pip>=10.0.1" twine docutils
+      - run:
           name: verify git tag vs. version
           command: |
             python setup.py verify
